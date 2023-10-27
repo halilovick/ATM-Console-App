@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -55,9 +57,55 @@ namespace ATMConsoleApp
 
         internal static void LogoutCustomer()
         {
-            Console.WriteLine("Thank you for using My ATM App.");
+            Console.WriteLine("Thank you for using our ATM!");
             Utility.PrintDotAnimation();
             Console.Clear();
+        }
+
+        internal static int SelectWithdrawalAmount()
+        {
+            Console.WriteLine("");
+            Console.WriteLine(":1.{0}10       2.{0}20", currency);
+            Console.WriteLine(":3.{0}50       4.{0}100", currency);
+            Console.WriteLine(":5.{0}500      6.{0}1000", currency);
+            Console.WriteLine(":7.{0}5000     8.{0}10000", currency);
+            Console.WriteLine(":0.Other");
+            Console.WriteLine("");
+
+            int selectedAmount = AppValidator.Convert<int>("option:");
+            switch (selectedAmount)
+            {
+                case 1:
+                    return 10;
+                case 2:
+                    return 20;
+                case 3:
+                    return 50;
+                case 4:
+                    return 100;
+                case 5:
+                    return 500;
+                case 6:
+                    return 1000;
+                case 7:
+                    return 5000;
+                case 8:
+                    return 10000;
+                case 0:
+                    return 0;
+                default:
+                    Utility.PrintMessage("Invalid input. Try again.", false);
+                    return -1;
+            }
+        }
+
+        internal InternalTransferTransaction CreateInternalTransferTransaction()
+        {
+            var internalTransfer = new InternalTransferTransaction();
+            internalTransfer.RecipientAccountNumber = AppValidator.Convert<long>("recipient's account number:");
+            internalTransfer.Amount = AppValidator.Convert<decimal>($"amount {currency}");
+            internalTransfer.RecipientAccountName = Utility.GetUserInput("recipient's name:");
+            return internalTransfer;
         }
     }
 }

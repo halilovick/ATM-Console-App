@@ -1,6 +1,8 @@
-﻿using System;
+﻿using ConsoleTables;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Transactions;
 
 namespace ATMConsoleApp
@@ -11,6 +13,7 @@ namespace ATMConsoleApp
         private static User selectedUser;
         private static List<TransactionProcess> _listOfTransactions;
         private static ATMScreen screen;
+        private const decimal minimumBalance = 100;
         static void Main()
         {
             screen = new ATMScreen();
@@ -52,7 +55,6 @@ namespace ATMConsoleApp
                     selectedUser = account;
                     if (inputAccount.CardNumber.Equals(selectedUser.CardNumber))
                     {
-
                         if (inputAccount.CardPin.Equals(selectedUser.CardPin))
                         {
                             selectedUser = account;
@@ -60,12 +62,12 @@ namespace ATMConsoleApp
                             break;
                         }
                     }
-                    if (isCorrectLogin == false)
-                    {
-                        Utility.PrintMessage("\nInvalid card number or PIN.", false);
-                    }
-                    Console.Clear();
                 }
+                if (isCorrectLogin == false)
+                {
+                    Utility.PrintMessage("\nInvalid card number or PIN.", false);
+                }
+                Console.Clear();
             }
         }
 
@@ -79,16 +81,16 @@ namespace ATMConsoleApp
                 case 2:
                     PlaceDeposit();
                     break;
-                /*case 3:
-                    MakeWithDrawal();
+                case 3:
+                    MakeWithdrawal();
                     break;
                 case 4:
-                    var internalTransfer = screen.InternalTransferForm();
+                    var internalTransfer = screen.CreateInternalTransferTransaction();
                     ProcessInternalTransfer(internalTransfer);
                     break;
                 case 5:
                     ViewTransaction();
-                    break;*/
+                    break;
                 case 6:
                     ATMScreen.LogoutCustomer();
                     Utility.PrintMessage("You have successfully logged out. Please collect " +
@@ -117,12 +119,12 @@ namespace ATMConsoleApp
 
             if (transactionAmount <= 0 || transactionAmount > 2000)
             {
-                Utility.PrintMessage("Amount needs to be a number between 0 and 2000. Try again.", false); ;
+                Utility.PrintMessage("Amount needs to be a number between 0 and 2000. Please try again.", false); ;
                 return;
             }
             if (transactionAmount % 5 != 0)
             {
-                Utility.PrintMessage($"Enter deposit amount in multiples of 5 or 10. Try again.", false);
+                Utility.PrintMessage($"Enter deposit amount in multiples of 5 or 10. Please try again.", false);
                 return;
             }
 
@@ -138,9 +140,6 @@ namespace ATMConsoleApp
 
             Utility.PrintMessage($"Your deposit of {transactionAmount} was " +
                 $"succesful.", true);
-            
-
-
         }
 
         private static bool ConfirmDeposit(int amount)
@@ -154,6 +153,121 @@ namespace ATMConsoleApp
 
             int opt = AppValidator.Convert<int>("Press 1 to confirm");
             return opt.Equals(1);
+        }
+
+        public static void MakeWithdrawal()
+        {
+            var transactionAmount = 0;
+            int selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            if (selectedAmount == -1)
+            {
+                MakeWithdrawal();
+                return;
+            }
+            else if (selectedAmount != 0)
+            {
+                transactionAmount = selectedAmount;
+            }
+            else
+            {
+                transactionAmount = AppValidator.Convert<int>($"amount {ATMScreen.currency}");
+            }
+
+            if (transactionAmount <= 0)
+            {
+                Utility.PrintMessage("Amount needs to be greater than zero. Try again", false);
+                return;
+            }
+            if (transactionAmount % 5 != 0)
+            {
+                Utility.PrintMessage("You can only withdraw amount in multiples of 5 or 10 euros. Please try again.", false);
+                return;
+            }
+
+            if (transactionAmount > selectedUser.AccountBalance)
+            {
+                Utility.PrintMessage($"Withdrawal failed. Your balance is too low to withdraw" +
+                    $"{transactionAmount}", false);
+                return;
+            }
+            if ((selectedUser.AccountBalance - transactionAmount) < minimumBalance)
+            {
+                Utility.PrintMessage($"Withdrawal failed. Your account needs to have " +
+                    $"at least {minimumBalance} left after transaction", false);
+                return;
+            }
+            CreateTransaction(selectedUser.Id, "Withdrawal", -transactionAmount, "");
+            selectedUser.AccountBalance -= transactionAmount;
+            Utility.PrintMessage($"You have successfully withdrawn " +
+                $"{transactionAmount}.", true);
+        }
+
+        private static void ProcessInternalTransfer(InternalTransferTransaction internalTransfer)
+        {
+            if (internalTransfer.Amount <= 0)
+            {
+                Utility.PrintMessage("Transfer amount needs to be greater than zero. Please try again.", false);
+                return;
+            }
+            if (internalTransfer.Amount > selectedUser.AccountBalance)
+            {
+                Utility.PrintMessage($"Transfer failed. Your balance is not enough" +
+                    $" to transfer {internalTransfer.Amount}", false);
+                return;
+            }
+            if ((selectedUser.AccountBalance - internalTransfer.Amount) < minimumBalance)
+            {
+                Utility.PrintMessage($"Transfer failed. Your account needs to have at least" +
+                    $" {minimumBalance} left after transaction", false);
+                return;
+            }
+
+            var selectedReciever = (from userAcc in userList
+                                               where userAcc.AccountNumber == internalTransfer.RecipientAccountNumber
+                                               select userAcc).FirstOrDefault();
+            if (selectedReciever == null)
+            {
+                Utility.PrintMessage("Transfer failed. Reciever bank account number is invalid.", false);
+                return;
+            }
+            if (selectedReciever.FullName != internalTransfer.RecipientAccountName)
+            {
+                Utility.PrintMessage("Transfer Failed. Recipient's bank account name does not match.", false);
+                return;
+            }
+
+            CreateTransaction(selectedUser.Id, "Transfer", -internalTransfer.Amount, "Transfered " +
+                $"to {selectedReciever.AccountNumber} ({selectedReciever.FullName})");
+
+            selectedUser.AccountBalance -= internalTransfer.Amount;
+
+            CreateTransaction(selectedReciever.Id, "Transfer", internalTransfer.Amount, "Transfered from " +
+                $"{selectedUser.AccountNumber}({selectedUser.FullName})");
+            selectedReciever.AccountBalance += internalTransfer.Amount;
+            Utility.PrintMessage($"You have successfully transfered" +
+                $" {internalTransfer.Amount} to " +
+                $"{internalTransfer.RecipientAccountName}", true);
+
+        }
+
+        public static void ViewTransaction()
+        {
+            var filteredTransactionList = _listOfTransactions.Where(t => t.UserBankAccountId == selectedUser.Id).ToList();
+            if (filteredTransactionList.Count <= 0)
+            {
+                Utility.PrintMessage("You have no transaction yet.", true);
+            }
+            else
+            {
+                var table = new ConsoleTable("Id", "Transaction Date", "Type", "Description", "Amount " + ATMScreen.currency);
+                foreach (var transaction in filteredTransactionList)
+                {
+                    table.AddRow(transaction.id, transaction.TransactionDate, transaction.TransactionType, transaction.Description, transaction.Amount);
+                }
+                table.Options.EnableCount = false;
+                table.Write();
+                Utility.PrintMessage($"You have {filteredTransactionList.Count} transaction(s)", true);
+            }
         }
 
         public static void CreateTransaction(long userBankAccountId, string transactionType, decimal transactionAmount, string description)
