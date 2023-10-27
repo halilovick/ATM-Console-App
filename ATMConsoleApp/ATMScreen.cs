@@ -43,7 +43,7 @@ namespace ATMConsoleApp
         internal static void DisplayAppMenu()
         {
             Console.Clear();
-            Console.WriteLine("-------My ATM App Menu-------");
+            Console.WriteLine("-------VVS ATM menu-------");
             Console.WriteLine(":                           :");
             Console.WriteLine("1. View Balance             :");
             Console.WriteLine("2. Deposit Money            :");
