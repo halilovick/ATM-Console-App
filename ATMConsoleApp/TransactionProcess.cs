@@ -8,11 +8,11 @@ namespace ATMConsoleApp
 {
     public class TransactionProcess
     {
-        public Decimal Amount { get; set; }
         public long id { get; set; }
-        public string Desrciption { get; set; }
+        public Decimal Amount { get; set; }
+        public string Description { get; set; }
         public long UserBankAccountId { get; set; }
-        //public TransactionType TransactionType { get; set; }
+        public string TransactionType { get; set; }
         public DateTime TransactionDate { get; set; }
 
     }

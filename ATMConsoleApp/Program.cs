@@ -9,7 +9,7 @@ namespace ATMConsoleApp
     {
         private static List<User> userList;
         private static User selectedUser;
-        private static List<Transaction> _listOfTransactions;
+        private static List<TransactionProcess> _listOfTransactions;
         private static ATMScreen screen;
         static void Main()
         {
@@ -22,7 +22,11 @@ namespace ATMConsoleApp
             ATMScreen.WelcomeScreen();
             CheckUserCredentials();
             ATMScreen.WelcomeCustomer(selectedUser.FullName);
-            ATMScreen.DisplayAppMenu();
+            while (true)
+            {
+                ATMScreen.DisplayAppMenu();
+                ProcessMenuChoice();
+            }
         }
         public static void InitializeData()
         {
@@ -33,7 +37,7 @@ namespace ATMConsoleApp
                 new User{Id=3, FullName = "Emir Salkic", AccountNumber=778899,CardNumber=555666, CardPin=1234,AccountBalance=2000.00m},
                 new User{Id=4, FullName = "Bakir Pljakic", AccountNumber=115599,CardNumber=777888, CardPin=1234,AccountBalance=30000.00m}
             };
-            _listOfTransactions = new List<Transaction>();
+            _listOfTransactions = new List<TransactionProcess>();
         }
 
         public static void CheckUserCredentials()
@@ -65,5 +69,106 @@ namespace ATMConsoleApp
             }
         }
 
+        private static void ProcessMenuChoice()
+        {
+            switch (AppValidator.Convert<int>("an option:"))
+            {
+                case 1:
+                    BalanceCheck();
+                    break;
+                case 2:
+                    PlaceDeposit();
+                    break;
+                /*case 3:
+                    MakeWithDrawal();
+                    break;
+                case 4:
+                    var internalTransfer = screen.InternalTransferForm();
+                    ProcessInternalTransfer(internalTransfer);
+                    break;
+                case 5:
+                    ViewTransaction();
+                    break;*/
+                case 6:
+                    ATMScreen.LogoutCustomer();
+                    Utility.PrintMessage("You have successfully logged out. Please collect " +
+                        "your ATM card.");
+                    Run();
+                    break;
+                default:
+                    Utility.PrintMessage("Invalid Option.", false);
+                    break;
+            }
+        }
+
+        public static void BalanceCheck()
+        {
+            Utility.PrintMessage($"Your account balance is: {selectedUser.AccountBalance} EUR");
+        }
+
+        public static void PlaceDeposit()
+        {
+            Console.WriteLine("\nOnly multiples of 5 and 10 euros allowed.\n");
+            var transactionAmount = AppValidator.Convert<int>($"amount {ATMScreen.currency}");
+
+            Console.WriteLine("\nChecking and counting bank notes.");
+            Utility.PrintDotAnimation();
+            Console.WriteLine("");
+
+            if (transactionAmount <= 0 || transactionAmount > 2000)
+            {
+                Utility.PrintMessage("Amount needs to be a number between 0 and 2000. Try again.", false); ;
+                return;
+            }
+            if (transactionAmount % 5 != 0)
+            {
+                Utility.PrintMessage($"Enter deposit amount in multiples of 5 or 10. Try again.", false);
+                return;
+            }
+
+            if (!ConfirmDeposit(transactionAmount))
+            {
+                Utility.PrintMessage($"You have cancelled your action.", false);
+                return;
+            }
+
+            CreateTransaction(selectedUser.Id, "Deposit", transactionAmount, "");
+
+            selectedUser.AccountBalance += transactionAmount;
+
+            Utility.PrintMessage($"Your deposit of {transactionAmount} was " +
+                $"succesful.", true);
+            
+
+
+        }
+
+        private static bool ConfirmDeposit(int amount)
+        {
+            int tenNotesCount = amount / 10;
+            int fiveNotesCount = (amount % 10) / 5;
+
+            Console.WriteLine("\nConfirm the deposit\n");
+            Console.WriteLine("------");
+            Console.WriteLine($"Total amount: {amount}\n\n");
+
+            int opt = AppValidator.Convert<int>("Press 1 to confirm");
+            return opt.Equals(1);
+        }
+
+        public static void CreateTransaction(long userBankAccountId, string transactionType, decimal transactionAmount, string description)
+        {
+            var transaction = new TransactionProcess()
+            {
+                id = Utility.GetTransactionId(),
+                Amount = transactionAmount,
+                Description = description,
+                UserBankAccountId = userBankAccountId,
+                TransactionType = transactionType,
+                TransactionDate = DateTime.Now
+            };
+
+            _listOfTransactions.Add(transaction);
+        }
     }
 }

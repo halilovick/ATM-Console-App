@@ -8,7 +8,7 @@ namespace ATMConsoleApp
 {
     public class ATMScreen
     {
-        internal const string cur = "EUR ";
+        internal const string currency = "EUR ";
         internal static void WelcomeScreen()
         {
             Console.Clear();
@@ -51,6 +51,13 @@ namespace ATMConsoleApp
             Console.WriteLine("4. Transfer Money           :");
             Console.WriteLine("5. View Transactions        :");
             Console.WriteLine("6. Logout                   :");
+        }
+
+        internal static void LogoutCustomer()
+        {
+            Console.WriteLine("Thank you for using My ATM App.");
+            Utility.PrintDotAnimation();
+            Console.Clear();
         }
     }
 }

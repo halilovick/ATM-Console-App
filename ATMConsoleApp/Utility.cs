@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,6 +12,12 @@ namespace ATMConsoleApp
 {
     public static class Utility
     {
+        private static long transactionCounter;
+        public static long GetTransactionId()
+        {
+            return ++transactionCounter;
+        }
+
         public static string GetPINInput(string prompt)
         {
             bool isPrompt = true;
