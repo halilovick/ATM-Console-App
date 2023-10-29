@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ATMConsoleApp
 {
@@ -61,7 +56,7 @@ namespace ATMConsoleApp
             return input.ToString();
         }
 
-        public static void PrintMessage(string msg, bool success = true)
+        public static void PrintMessage(string msg, bool success = true, bool pressEnter = true)
         {
             if (success)
             {
@@ -73,22 +68,28 @@ namespace ATMConsoleApp
             }
             Console.WriteLine(msg);
             Console.ForegroundColor = ConsoleColor.White;
-            PressEnterToContinue();
+            if (pressEnter)
+            {
+                PressEnterToContinue();
+            }
         }
         public static string GetUserInput(string prompt)
         {
-            Console.WriteLine($"Enter {prompt}");
+            Console.WriteLine(prompt);
             return Console.ReadLine();
         }
 
-        public static void PrintDotAnimation()
+        public static void PrintDotAnimation(bool consoleClear = true)
         {
             for (int i = 0; i < 5; i++)
             {
                 Console.Write(".");
                 Thread.Sleep(200);
             }
-            Console.Clear();
+            if (consoleClear)
+            {
+                Console.Clear();
+            }
         }
         public static void PressEnterToContinue()
         {

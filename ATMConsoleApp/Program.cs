@@ -1,9 +1,8 @@
-﻿using ConsoleTables;
+﻿using ATMConsoleApp.Models;
+using ConsoleTables;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Transactions;
 
 namespace ATMConsoleApp
 {
@@ -72,7 +71,7 @@ namespace ATMConsoleApp
 
         private static void ProcessMenuChoice()
         {
-            switch (AppValidator.Convert<int>("an option:"))
+            switch (Utility.Convert<int>("Enter an option:"))
             {
                 case 1:
                     BalanceCheck();
@@ -91,7 +90,8 @@ namespace ATMConsoleApp
                     try
                     {
                         MakeWithdrawal();
-                    } catch (Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         Utility.PrintMessage(ex.Message, false);
                     }
@@ -130,7 +130,7 @@ namespace ATMConsoleApp
         public static void PlaceDeposit()
         {
             Console.WriteLine("\nOnly multiples of 5 and 10 euros allowed.\n");
-            var transactionAmount = AppValidator.Convert<int>($"amount {ATMScreen.currency}");
+            var transactionAmount = Utility.Convert<int>($"Enter an amount {ATMScreen.currency}");
 
             Console.WriteLine("\nChecking and counting bank notes.");
             Utility.PrintDotAnimation();
@@ -161,14 +161,11 @@ namespace ATMConsoleApp
 
         private static bool ConfirmDeposit(int amount)
         {
-            int tenNotesCount = amount / 10;
-            int fiveNotesCount = (amount % 10) / 5;
-
             Console.WriteLine("\nConfirm the deposit\n");
             Console.WriteLine("------");
             Console.WriteLine($"Total amount: {amount}\n\n");
 
-            int opt = AppValidator.Convert<int>("Press 1 to confirm");
+            int opt = Utility.Convert<int>("Press 1 to confirm");
             return opt.Equals(1);
         }
 
@@ -187,7 +184,7 @@ namespace ATMConsoleApp
             }
             else
             {
-                transactionAmount = AppValidator.Convert<int>($"amount {ATMScreen.currency}");
+                transactionAmount = Utility.Convert<int>($"Enter an amount {ATMScreen.currency}");
             }
 
             if (transactionAmount <= 0)
@@ -223,8 +220,8 @@ namespace ATMConsoleApp
             }
 
             var selectedReciever = (from userAcc in userList
-                                               where userAcc.AccountNumber == internalTransfer.RecipientAccountNumber
-                                               select userAcc).FirstOrDefault();
+                                    where userAcc.AccountNumber == internalTransfer.RecipientAccountNumber
+                                    select userAcc).FirstOrDefault();
             if (selectedReciever == null)
             {
                 throw new ArgumentException("Transfer failed. Reciever bank account number is invalid.");
@@ -248,6 +245,33 @@ namespace ATMConsoleApp
 
         }
 
+        private static void sortTableByAmount()
+        {
+            var filteredTransactionList = _listOfTransactions.Where(t => t.UserBankAccountId == selectedUser.Id).ToList();
+            var sortedTransactionList = filteredTransactionList.OrderByDescending(transaction => transaction.Amount).ToList();
+            var sortedTable = new ConsoleTable("Id", "Transaction Date", "Type", "Description", "Amount " + ATMScreen.currency);
+            foreach (var transaction in sortedTransactionList)
+            {
+                sortedTable.AddRow(transaction.id, transaction.TransactionDate, transaction.TransactionType, transaction.Description, transaction.Amount);
+            }
+            sortedTable.Options.EnableCount = false;
+            Console.WriteLine("");
+            sortedTable.Write();
+        }
+
+        private static void sortTableByType()
+        {
+            var filteredTransactionList = _listOfTransactions.Where(t => t.UserBankAccountId == selectedUser.Id).ToList();
+            var sortedTransactionList = filteredTransactionList.OrderBy(transaction => transaction.TransactionType).ToList();
+            var sortedTable = new ConsoleTable("Id", "Transaction Date", "Type", "Description", "Amount " + ATMScreen.currency);
+            foreach (var transaction in sortedTransactionList)
+            {
+                sortedTable.AddRow(transaction.id, transaction.TransactionDate, transaction.TransactionType, transaction.Description, transaction.Amount);
+            }
+            sortedTable.Options.EnableCount = false;
+            sortedTable.Write();
+        }
+
         public static void ViewTransaction()
         {
             var filteredTransactionList = _listOfTransactions.Where(t => t.UserBankAccountId == selectedUser.Id).ToList();
@@ -264,7 +288,25 @@ namespace ATMConsoleApp
                 }
                 table.Options.EnableCount = false;
                 table.Write();
-                Utility.PrintMessage($"You have {filteredTransactionList.Count} transaction(s)", true);
+                Utility.PrintMessage($"You have {filteredTransactionList.Count} transaction(s)\n", true, false);
+                Console.WriteLine("Press 1 to sort by Amount, 2 to sort by Type, 3 to continue...");
+                switch (Console.ReadLine())
+                {
+                    case "1":
+                        Console.WriteLine("\nSorting by amount...");
+                        Utility.PrintDotAnimation(false);
+                        sortTableByAmount();
+                        Utility.PressEnterToContinue();
+                        break;
+                    case "2":
+                        Console.WriteLine("\nSorting by type...");
+                        Utility.PrintDotAnimation(false);
+                        sortTableByType();
+                        Utility.PressEnterToContinue();
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 

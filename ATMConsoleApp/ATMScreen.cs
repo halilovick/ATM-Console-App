@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ATMConsoleApp.Models;
+using System;
 
 namespace ATMConsoleApp
 {
@@ -25,7 +20,7 @@ namespace ATMConsoleApp
         {
             User tempUser = new User();
 
-            tempUser.CardNumber = Utility.Convert<long>("your card number.");
+            tempUser.CardNumber = Utility.Convert<long>("Enter your card number.");
             tempUser.CardPin = Convert.ToInt32(Utility.GetPINInput("Enter your card PIN"));
             return tempUser;
         }
@@ -78,7 +73,7 @@ namespace ATMConsoleApp
             Console.WriteLine("------------------------------");
             Console.WriteLine("");
 
-            int selectedAmount = AppValidator.Convert<int>("option:");
+            int selectedAmount = Utility.Convert<int>("Enter an option:");
             switch (selectedAmount)
             {
                 case 1:
@@ -108,9 +103,9 @@ namespace ATMConsoleApp
         internal InternalTransferTransaction CreateInternalTransferTransaction()
         {
             var internalTransfer = new InternalTransferTransaction();
-            internalTransfer.RecipientAccountNumber = AppValidator.Convert<long>("recipient's account number:");
-            internalTransfer.Amount = AppValidator.Convert<decimal>($"amount {currency}");
-            internalTransfer.RecipientAccountName = Utility.GetUserInput("recipient's name:");
+            internalTransfer.RecipientAccountNumber = Utility.Convert<long>("Enter recipient's account number:");
+            internalTransfer.Amount = Utility.Convert<decimal>($"amount {currency}");
+            internalTransfer.RecipientAccountName = Utility.GetUserInput("Enter recipient's name:");
             return internalTransfer;
         }
     }
