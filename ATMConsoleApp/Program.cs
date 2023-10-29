@@ -156,7 +156,8 @@ namespace ATMConsoleApp
             selectedUser.AccountBalance += transactionAmount;
 
             Utility.PrintMessage($"Your deposit of {transactionAmount} was " +
-                $"succesful.", true);
+                $"succesful.", true, false);
+            Utility.PrintDotAnimation();
         }
 
         private static bool ConfirmDeposit(int amount)
