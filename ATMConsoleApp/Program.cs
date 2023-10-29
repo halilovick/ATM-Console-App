@@ -11,7 +11,6 @@ namespace ATMConsoleApp
     class Program
     {
         private static List<User> userList;
-        private static List<string> hashPinList;
         private static User selectedUser;
         private static List<TransactionProcess> _listOfTransactions;
         private static ATMScreen screen;
@@ -32,11 +31,13 @@ namespace ATMConsoleApp
                 ProcessMenuChoice();
             }
         }
-        public static string HashFunction(int pin)
+      
+
+        public static string HashFunction(string pin)
         {
             using (SHA256 sha256 = SHA256.Create())
             {
-                byte[] pinBytes = Encoding.UTF8.GetBytes(pin.ToString());
+                byte[] pinBytes = Encoding.UTF8.GetBytes(pin);
                 byte[] hashBytes = sha256.ComputeHash(pinBytes);
                 string pinHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
 
@@ -48,16 +49,11 @@ namespace ATMConsoleApp
         {
             userList = new List<User>
             {
-                new User{Id=1, FullName = "Kerim Halilovic", AccountNumber=112233,CardNumber=111222, CardPin=1234,AccountBalance=50000.00m},
-                new User{Id=2, FullName = "Emir Kalajdzija", AccountNumber=445566,CardNumber=333444, CardPin=1234,AccountBalance=4000.00m},
-                new User{Id=3, FullName = "Emir Salkic", AccountNumber=778899,CardNumber=555666, CardPin=1234,AccountBalance=2000.00m},
-                new User{Id=4, FullName = "Bakir Pljakic", AccountNumber=115599,CardNumber=777888, CardPin=1234,AccountBalance=30000.00m}
+                new User{Id=1, FullName = "Kerim Halilovic", AccountNumber=112233,CardNumber=111222, CardPin=HashFunction("1234"),AccountBalance=50000.00m},
+                new User{Id=2, FullName = "Emir Kalajdzija", AccountNumber=445566,CardNumber=333444, CardPin=HashFunction("1234"),AccountBalance=4000.00m},
+                new User{Id=3, FullName = "Emir Salkic", AccountNumber=778899,CardNumber=555666, CardPin=HashFunction("1234"),AccountBalance=2000.00m},
+                new User{Id=4, FullName = "Bakir Pljakic", AccountNumber=115599,CardNumber=777888, CardPin=HashFunction("1234"),AccountBalance=30000.00m}
             };
-            hashPinList = new List<string>();
-            foreach (User user in userList)
-            {
-                hashPinList.Add(HashFunction(user.CardPin).ToString());
-            }
             _listOfTransactions = new List<TransactionProcess>();
         }
 
@@ -71,9 +67,11 @@ namespace ATMConsoleApp
                 foreach (User account in userList)
                 {
                     selectedUser = account;
+                    string provjera = HashFunction(selectedUser.CardPin);
+                    inputAccount.CardPin = provjera;
                     if (inputAccount.CardNumber.Equals(selectedUser.CardNumber))
                     {
-                        if (inputAccount.CardPin.Equals(selectedUser.CardPin))
+                        if (inputAccount.CardPin.Equals(provjera))
                         {
                             selectedUser = account;
                             isCorrectLogin = true;
@@ -89,11 +87,13 @@ namespace ATMConsoleApp
             }
         }
 
-        public static void ChangePin(int pin, int id)
+        public static void ChangePin(string pin, int id)
         {
             foreach (User account in userList)
             {
-                if (account.Id == id) account.CardPin = pin;
+                if (account.Id == id) account.CardPin = HashFunction(pin);
+                
+               
             }
         }
 
@@ -139,7 +139,7 @@ namespace ATMConsoleApp
                     ViewTransaction();
                     break;
                 case 6:
-                    int pin = ATMScreen.ChangePIN();
+                    string pin = ATMScreen.ChangePIN();
                     ChangePin(pin, selectedUser.Id);
                     break;
                 case 7:

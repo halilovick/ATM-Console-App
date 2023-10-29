@@ -21,7 +21,8 @@ namespace ATMConsoleApp
             User tempUser = new User();
 
             tempUser.CardNumber = Utility.Convert<long>("Enter your card number.");
-            tempUser.CardPin = Convert.ToInt32(Utility.GetPINInput("Enter your card PIN"));
+            tempUser.CardPin = Convert.ToString(Utility.GetPINInput("Enter your card PIN"));
+            Program.HashFunction(tempUser.CardPin);
             return tempUser;
         }
 
@@ -37,9 +38,9 @@ namespace ATMConsoleApp
             Utility.PressEnterToContinue();
         }
 
-        internal static int ChangePIN()
+        internal static string ChangePIN()
         {
-            return Convert.ToInt32(Utility.GetPINInput("Enter your new PIN"));
+            return Convert.ToString(Utility.GetPINInput("Enter your new PIN"));
         }
 
 
