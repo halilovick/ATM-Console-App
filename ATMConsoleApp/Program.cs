@@ -13,7 +13,6 @@ namespace ATMConsoleApp
         private static User selectedUser;
         private static List<TransactionProcess> _listOfTransactions;
         private static ATMScreen screen;
-        private const decimal minimumBalance = 100;
         static void Main()
         {
             screen = new ATMScreen();
@@ -79,14 +78,34 @@ namespace ATMConsoleApp
                     BalanceCheck();
                     break;
                 case 2:
-                    PlaceDeposit();
+                    try
+                    {
+                        PlaceDeposit();
+                    }
+                    catch (Exception ex)
+                    {
+                        Utility.PrintMessage(ex.Message, false);
+                    }
                     break;
                 case 3:
-                    MakeWithdrawal();
+                    try
+                    {
+                        MakeWithdrawal();
+                    } catch (Exception ex)
+                    {
+                        Utility.PrintMessage(ex.Message, false);
+                    }
                     break;
                 case 4:
                     var internalTransfer = screen.CreateInternalTransferTransaction();
-                    ProcessInternalTransfer(internalTransfer);
+                    try
+                    {
+                        ProcessInternalTransfer(internalTransfer);
+                    }
+                    catch (Exception ex)
+                    {
+                        Utility.PrintMessage(ex.Message, false);
+                    }
                     break;
                 case 5:
                     ViewTransaction();
@@ -119,13 +138,11 @@ namespace ATMConsoleApp
 
             if (transactionAmount <= 0 || transactionAmount > 2000)
             {
-                Utility.PrintMessage("Amount needs to be a number between 0 and 2000. Please try again.", false); ;
-                return;
+                throw new ArgumentException("Amount needs to be a number between 0 and 2000. Please try again.");
             }
             if (transactionAmount % 5 != 0)
             {
-                Utility.PrintMessage($"Enter deposit amount in multiples of 5 or 10. Please try again.", false);
-                return;
+                throw new ArgumentException($"Enter deposit amount in multiples of 5 or 10. Please try again.");
             }
 
             if (!ConfirmDeposit(transactionAmount))
@@ -175,26 +192,17 @@ namespace ATMConsoleApp
 
             if (transactionAmount <= 0)
             {
-                Utility.PrintMessage("Amount needs to be greater than zero. Try again", false);
-                return;
+                throw new ArgumentException("Amount needs to be greater than zero. Try again");
             }
             if (transactionAmount % 5 != 0)
             {
-                Utility.PrintMessage("You can only withdraw amount in multiples of 5 or 10 euros. Please try again.", false);
-                return;
+                throw new ArgumentException("You can only withdraw amount in multiples of 5 or 10 euros. Please try again.");
             }
 
             if (transactionAmount > selectedUser.AccountBalance)
             {
-                Utility.PrintMessage($"Withdrawal failed. Your balance is too low to withdraw" +
-                    $"{transactionAmount}", false);
-                return;
-            }
-            if ((selectedUser.AccountBalance - transactionAmount) < minimumBalance)
-            {
-                Utility.PrintMessage($"Withdrawal failed. Your account needs to have " +
-                    $"at least {minimumBalance} left after transaction", false);
-                return;
+                throw new ArgumentException($"Withdrawal failed. Your balance is too low to withdraw " +
+                    $"{transactionAmount}");
             }
             CreateTransaction(selectedUser.Id, "Withdrawal", -transactionAmount, "");
             selectedUser.AccountBalance -= transactionAmount;
@@ -206,20 +214,12 @@ namespace ATMConsoleApp
         {
             if (internalTransfer.Amount <= 0)
             {
-                Utility.PrintMessage("Transfer amount needs to be greater than zero. Please try again.", false);
-                return;
+                throw new ArgumentException("Transfer amount needs to be greater than zero. Please try again.");
             }
             if (internalTransfer.Amount > selectedUser.AccountBalance)
             {
-                Utility.PrintMessage($"Transfer failed. Your balance is not enough" +
-                    $" to transfer {internalTransfer.Amount}", false);
-                return;
-            }
-            if ((selectedUser.AccountBalance - internalTransfer.Amount) < minimumBalance)
-            {
-                Utility.PrintMessage($"Transfer failed. Your account needs to have at least" +
-                    $" {minimumBalance} left after transaction", false);
-                return;
+                throw new ArgumentException($"Transfer failed. Your balance is not enough" +
+                    $" to transfer {internalTransfer.Amount}");
             }
 
             var selectedReciever = (from userAcc in userList
@@ -227,13 +227,11 @@ namespace ATMConsoleApp
                                                select userAcc).FirstOrDefault();
             if (selectedReciever == null)
             {
-                Utility.PrintMessage("Transfer failed. Reciever bank account number is invalid.", false);
-                return;
+                throw new ArgumentException("Transfer failed. Reciever bank account number is invalid.");
             }
             if (selectedReciever.FullName != internalTransfer.RecipientAccountName)
             {
-                Utility.PrintMessage("Transfer Failed. Recipient's bank account name does not match.", false);
-                return;
+                throw new ArgumentException("Transfer Failed. Recipient's bank account name does not match.");
             }
 
             CreateTransaction(selectedUser.Id, "Transfer", -internalTransfer.Amount, "Transfered " +
