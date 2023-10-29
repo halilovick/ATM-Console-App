@@ -69,6 +69,14 @@ namespace ATMConsoleApp
             }
         }
 
+        public static void ChangePin(int pin, int id)
+        {
+            foreach (User account in userList)
+            {
+                if (account.Id == id) account.CardPin = pin;
+            }
+        }
+
         private static void ProcessMenuChoice()
         {
             switch (Utility.Convert<int>("Enter an option:"))
@@ -111,6 +119,10 @@ namespace ATMConsoleApp
                     ViewTransaction();
                     break;
                 case 6:
+                    int pin = ATMScreen.ChangePIN();
+                    ChangePin(pin, selectedUser.Id);
+                    break;
+                case 7:
                     ATMScreen.LogoutCustomer();
                     Utility.PrintMessage("You have successfully logged out. Please collect " +
                         "your ATM card.");

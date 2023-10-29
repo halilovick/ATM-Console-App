@@ -37,6 +37,12 @@ namespace ATMConsoleApp
             Utility.PressEnterToContinue();
         }
 
+        internal static int ChangePIN()
+        {
+            return Convert.ToInt32(Utility.GetPINInput("Enter your new PIN"));
+        }
+
+
         internal static void DisplayAppMenu()
         {
             Console.Clear();
@@ -47,7 +53,8 @@ namespace ATMConsoleApp
             Console.WriteLine(": 3. Withdraw Money      :");
             Console.WriteLine(": 4. Transfer Money      :");
             Console.WriteLine(": 5. View Transactions   :");
-            Console.WriteLine(": 6. Logout              :");
+            Console.WriteLine(": 6. Change PIN          :");
+            Console.WriteLine(": 7. Logout              :");
             Console.WriteLine(":                        :");
             Console.WriteLine("--------------------------");
         }
