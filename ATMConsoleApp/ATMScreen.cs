@@ -46,13 +46,15 @@ namespace ATMConsoleApp
         {
             Console.Clear();
             Console.WriteLine("-------VVS ATM menu-------");
-            Console.WriteLine(":                           :");
-            Console.WriteLine("1. View Balance             :");
-            Console.WriteLine("2. Deposit Money            :");
-            Console.WriteLine("3. Withdraw Money           :");
-            Console.WriteLine("4. Transfer Money           :");
-            Console.WriteLine("5. View Transactions        :");
-            Console.WriteLine("6. Logout                   :");
+            Console.WriteLine(":                        :");
+            Console.WriteLine(": 1. View Balance        :");
+            Console.WriteLine(": 2. Deposit Money       :");
+            Console.WriteLine(": 3. Withdraw Money      :");
+            Console.WriteLine(": 4. Transfer Money      :");
+            Console.WriteLine(": 5. View Transactions   :");
+            Console.WriteLine(": 6. Logout              :");
+            Console.WriteLine(":                        :");
+            Console.WriteLine("--------------------------");
         }
 
         internal static void LogoutCustomer()
@@ -65,11 +67,15 @@ namespace ATMConsoleApp
         internal static int SelectWithdrawalAmount()
         {
             Console.WriteLine("");
-            Console.WriteLine(":1.{0}10       2.{0}20", currency);
-            Console.WriteLine(":3.{0}50       4.{0}100", currency);
-            Console.WriteLine(":5.{0}500      6.{0}1000", currency);
-            Console.WriteLine(":7.{0}5000     8.{0}10000", currency);
-            Console.WriteLine(":0.Other");
+            Console.WriteLine("------------------------------");
+            Console.WriteLine(":                            :");
+            Console.WriteLine(": 1.{0}10       2.{0}20    :", currency);
+            Console.WriteLine(": 3.{0}50       4.{0}100   :", currency);
+            Console.WriteLine(": 5.{0}500      6.{0}1000  :", currency);
+            Console.WriteLine(": 7.{0}5000     8.{0}10000 :", currency);
+            Console.WriteLine(": 0.Other                    :");
+            Console.WriteLine(":                            :");
+            Console.WriteLine("------------------------------");
             Console.WriteLine("");
 
             int selectedAmount = AppValidator.Convert<int>("option:");
