@@ -3,12 +3,15 @@ using ConsoleTables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace ATMConsoleApp
 {
     class Program
     {
         private static List<User> userList;
+        private static List<string> hashPinList;
         private static User selectedUser;
         private static List<TransactionProcess> _listOfTransactions;
         private static ATMScreen screen;
@@ -29,6 +32,18 @@ namespace ATMConsoleApp
                 ProcessMenuChoice();
             }
         }
+        public static string HashFunction(int pin)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] pinBytes = Encoding.UTF8.GetBytes(pin.ToString());
+                byte[] hashBytes = sha256.ComputeHash(pinBytes);
+                string pinHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+
+                return pinHash;
+            }
+        }
+
         public static void InitializeData()
         {
             userList = new List<User>
@@ -38,6 +53,11 @@ namespace ATMConsoleApp
                 new User{Id=3, FullName = "Emir Salkic", AccountNumber=778899,CardNumber=555666, CardPin=1234,AccountBalance=2000.00m},
                 new User{Id=4, FullName = "Bakir Pljakic", AccountNumber=115599,CardNumber=777888, CardPin=1234,AccountBalance=30000.00m}
             };
+            hashPinList = new List<string>();
+            foreach (User user in userList)
+            {
+                hashPinList.Add(HashFunction(user.CardPin).ToString());
+            }
             _listOfTransactions = new List<TransactionProcess>();
         }
 
