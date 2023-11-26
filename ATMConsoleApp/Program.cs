@@ -8,11 +8,11 @@ using System.Text;
 
 namespace ATMConsoleApp
 {
-    class Program
+    public class Program
     {
-        private static List<User> userList;
-        private static User selectedUser;
-        private static List<TransactionProcess> _listOfTransactions;
+        public static List<User> userList;
+        public static User selectedUser;
+        public static List<TransactionProcess> _listOfTransactions;
         private static ATMScreen screen;
         static void Main()
         {
@@ -20,6 +20,7 @@ namespace ATMConsoleApp
             InitializeData();
             Run();
         }
+
         public static void Run()
         {
             ATMScreen.WelcomeScreen();
@@ -31,7 +32,6 @@ namespace ATMConsoleApp
                 ProcessMenuChoice();
             }
         }
-      
 
         public static string HashFunction(string pin)
         {
@@ -40,7 +40,6 @@ namespace ATMConsoleApp
                 byte[] pinBytes = Encoding.UTF8.GetBytes(pin);
                 byte[] hashBytes = sha256.ComputeHash(pinBytes);
                 string pinHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-
                 return pinHash;
             }
         }
@@ -92,8 +91,6 @@ namespace ATMConsoleApp
             foreach (User account in userList)
             {
                 if (account.Id == id) account.CardPin = HashFunction(pin);
-                
-               
             }
         }
 
@@ -159,37 +156,46 @@ namespace ATMConsoleApp
             Utility.PrintMessage($"Your account balance is: {selectedUser.AccountBalance} EUR");
         }
 
-        public static void PlaceDeposit()
+        public static void PlaceDeposit(int amount = -1)
         {
             Console.WriteLine("\nOnly multiples of 5 and 10 euros allowed.\n");
-            var transactionAmount = Utility.Convert<int>($"Enter an amount {ATMScreen.currency}");
-
-            Console.WriteLine("\nChecking and counting bank notes.");
-            Utility.PrintDotAnimation();
-            Console.WriteLine("");
-
-            if (transactionAmount <= 0 || transactionAmount > 2000)
+            var transactionAmount = 0;
+            if (amount == -1)
             {
-                throw new ArgumentException("Amount needs to be a number between 0 and 2000. Please try again.");
-            }
-            if (transactionAmount % 5 != 0)
-            {
-                throw new ArgumentException($"Enter deposit amount in multiples of 5 or 10. Please try again.");
-            }
+                transactionAmount = Utility.Convert<int>($"Enter an amount {ATMScreen.currency}");
+                Console.WriteLine("\nChecking and counting bank notes.");
+                Utility.PrintDotAnimation();
+                Console.WriteLine("");
 
-            if (!ConfirmDeposit(transactionAmount))
+                if (transactionAmount <= 0 || transactionAmount > 2000)
+                {
+                    throw new ArgumentException("Amount needs to be a number between 0 and 2000. Please try again.");
+                }
+                if (transactionAmount % 5 != 0)
+                {
+                    throw new ArgumentException($"Enter deposit amount in multiples of 5 or 10. Please try again.");
+                }
+
+                if (!ConfirmDeposit(transactionAmount))
+                {
+                    Utility.PrintMessage($"You have cancelled your action.", false);
+                    return;
+                }
+            } else
             {
-                Utility.PrintMessage($"You have cancelled your action.", false);
-                return;
+                transactionAmount = amount;
             }
 
             CreateTransaction(selectedUser.Id, "Deposit", transactionAmount, "");
 
             selectedUser.AccountBalance += transactionAmount;
 
-            Utility.PrintMessage($"Your deposit of {transactionAmount} was " +
+            if(amount == -1)
+            {
+                Utility.PrintMessage($"Your deposit of {transactionAmount} was " +
                 $"succesful.", true, false);
-            Utility.PrintDotAnimation();
+                Utility.PrintDotAnimation();
+            }
         }
 
         private static bool ConfirmDeposit(int amount)
@@ -202,10 +208,17 @@ namespace ATMConsoleApp
             return opt.Equals(1);
         }
 
-        public static void MakeWithdrawal()
+        public static void MakeWithdrawal(int amount = -2)
         {
             var transactionAmount = 0;
-            int selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            var selectedAmount = 0;
+            if(amount == -2)
+            {
+                selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            } else
+            {
+                selectedAmount = amount;
+            }
             if (selectedAmount == -1)
             {
                 MakeWithdrawal();
@@ -236,8 +249,11 @@ namespace ATMConsoleApp
             }
             CreateTransaction(selectedUser.Id, "Withdrawal", -transactionAmount, "");
             selectedUser.AccountBalance -= transactionAmount;
-            Utility.PrintMessage($"You have successfully withdrawn " +
-                $"{transactionAmount}.", true);
+            if(amount == -2)
+            {
+                Utility.PrintMessage($"You have successfully withdrawn {transactionAmount}", true, false);
+                Utility.PrintDotAnimation();
+            }
         }
 
         private static void ProcessInternalTransfer(InternalTransferTransaction internalTransfer)
