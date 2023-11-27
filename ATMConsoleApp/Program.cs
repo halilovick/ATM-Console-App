@@ -160,21 +160,12 @@ namespace ATMConsoleApp
         {
             Console.WriteLine("\nOnly multiples of 5 and 10 euros allowed.\n");
             var transactionAmount = 0;
-            if (amount == -1)
+            if (amount == -1) 
             {
                 transactionAmount = Utility.Convert<int>($"Enter an amount {ATMScreen.currency}");
                 Console.WriteLine("\nChecking and counting bank notes.");
                 Utility.PrintDotAnimation();
                 Console.WriteLine("");
-
-                if (transactionAmount <= 0 || transactionAmount > 2000)
-                {
-                    throw new ArgumentException("Amount needs to be a number between 0 and 2000. Please try again.");
-                }
-                if (transactionAmount % 5 != 0)
-                {
-                    throw new ArgumentException($"Enter deposit amount in multiples of 5 or 10. Please try again.");
-                }
 
                 if (!ConfirmDeposit(transactionAmount))
                 {
@@ -184,6 +175,15 @@ namespace ATMConsoleApp
             } else
             {
                 transactionAmount = amount;
+            }
+
+            if (transactionAmount <= 0 || transactionAmount > 2000)
+            {
+                throw new ArgumentException("Amount needs to be a number between 0 and 2000. Please try again.");
+            }
+            if (transactionAmount % 5 != 0)
+            {
+                throw new ArgumentException($"Enter deposit amount in multiples of 5 or 10. Please try again.");
             }
 
             CreateTransaction(selectedUser.Id, "Deposit", transactionAmount, "");

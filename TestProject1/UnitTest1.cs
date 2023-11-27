@@ -63,5 +63,36 @@ namespace TestProject1
             var ex = Assert.Throws<System.ArgumentException>(() => Program.MakeWithdrawal(1100));
             Assert.That(ex.Message, Is.EqualTo("Withdrawal failed. Your balance is too low to withdraw 1100"));
         }
+
+        [Test]
+        public void WithdrawMoneyExceptionTest2()
+        {
+            Program.selectedUser = Program.userList[0];
+            Program.selectedUser.AccountBalance = 1000;
+            var ex = Assert.Throws<System.ArgumentException>( () => Program.MakeWithdrawal(249));
+            Assert.That(ex.Message, Is.EqualTo("You can only withdraw amount in multiples of 5 or 10 euros. Please try again."));
+        }
+
+
+        [Test]
+        public void PlaceDepositExceptionTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            var ex = Assert.Throws<System.ArgumentException>(() => Program.PlaceDeposit(2001));
+            Assert.That(ex.Message, Is.EqualTo("Amount needs to be a number between 0 and 2000. Please try again."));
+        }
+
+
+        [Test]
+        public void PlaceDepositExceptionTest2()
+        {
+            Program.selectedUser= Program.userList[0];
+            var ex = Assert.Throws<System.ArgumentException>(() => Program.PlaceDeposit(139));
+            Assert.That(ex.Message, Is.EqualTo("Enter deposit amount in multiples of 5 or 10. Please try again."));
+        }
+
+
+
+        
     }
 }
