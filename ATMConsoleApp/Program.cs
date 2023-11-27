@@ -56,7 +56,7 @@ namespace ATMConsoleApp
             _listOfTransactions = new List<TransactionProcess>();
         }
 
-        public static void CheckUserCredentials()
+        public static bool CheckUserCredentials()
         {
             bool isCorrectLogin = false;
             while (!isCorrectLogin)
@@ -84,6 +84,7 @@ namespace ATMConsoleApp
                 }
                 Console.Clear();
             }
+            return isCorrectLogin;
         }
 
         public static void ChangePin(string pin, int id)
@@ -160,7 +161,7 @@ namespace ATMConsoleApp
         {
             Console.WriteLine("\nOnly multiples of 5 and 10 euros allowed.\n");
             var transactionAmount = 0;
-            if (amount == -1) 
+            if (amount == -1)
             {
                 transactionAmount = Utility.Convert<int>($"Enter an amount {ATMScreen.currency}");
                 Console.WriteLine("\nChecking and counting bank notes.");
@@ -172,7 +173,8 @@ namespace ATMConsoleApp
                     Utility.PrintMessage($"You have cancelled your action.", false);
                     return;
                 }
-            } else
+            }
+            else
             {
                 transactionAmount = amount;
             }
@@ -190,7 +192,7 @@ namespace ATMConsoleApp
 
             selectedUser.AccountBalance += transactionAmount;
 
-            if(amount == -1)
+            if (amount == -1)
             {
                 Utility.PrintMessage($"Your deposit of {transactionAmount} was " +
                 $"succesful.", true, false);
@@ -198,7 +200,7 @@ namespace ATMConsoleApp
             }
         }
 
-        private static bool ConfirmDeposit(int amount)
+        public static bool ConfirmDeposit(int amount)
         {
             Console.WriteLine("\nConfirm the deposit\n");
             Console.WriteLine("------");
@@ -212,10 +214,11 @@ namespace ATMConsoleApp
         {
             var transactionAmount = 0;
             var selectedAmount = 0;
-            if(amount == -2)
+            if (amount == -2)
             {
                 selectedAmount = ATMScreen.SelectWithdrawalAmount();
-            } else
+            }
+            else
             {
                 selectedAmount = amount;
             }
@@ -249,7 +252,7 @@ namespace ATMConsoleApp
             }
             CreateTransaction(selectedUser.Id, "Withdrawal", -transactionAmount, "");
             selectedUser.AccountBalance -= transactionAmount;
-            if(amount == -2)
+            if (amount == -2)
             {
                 Utility.PrintMessage($"You have successfully withdrawn {transactionAmount}", true, false);
                 Utility.PrintDotAnimation();
@@ -294,7 +297,7 @@ namespace ATMConsoleApp
 
         }
 
-        private static void sortTableByAmount()
+        public static ConsoleTable sortTableByAmount()
         {
             var filteredTransactionList = _listOfTransactions.Where(t => t.UserBankAccountId == selectedUser.Id).ToList();
             var sortedTransactionList = filteredTransactionList.OrderByDescending(transaction => transaction.Amount).ToList();
@@ -306,9 +309,10 @@ namespace ATMConsoleApp
             sortedTable.Options.EnableCount = false;
             Console.WriteLine("");
             sortedTable.Write();
+            return sortedTable;
         }
 
-        private static void sortTableByType()
+        public static ConsoleTable sortTableByType()
         {
             var filteredTransactionList = _listOfTransactions.Where(t => t.UserBankAccountId == selectedUser.Id).ToList();
             var sortedTransactionList = filteredTransactionList.OrderBy(transaction => transaction.TransactionType).ToList();
@@ -319,6 +323,7 @@ namespace ATMConsoleApp
             }
             sortedTable.Options.EnableCount = false;
             sortedTable.Write();
+            return sortedTable;
         }
 
         public static void ViewTransaction()

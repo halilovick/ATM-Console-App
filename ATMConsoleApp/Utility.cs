@@ -86,10 +86,6 @@ namespace ATMConsoleApp
                 Console.Write(".");
                 Thread.Sleep(200);
             }
-            if (consoleClear)
-            {
-                Console.Clear();
-            }
         }
         public static void PressEnterToContinue()
         {
