@@ -95,7 +95,7 @@ namespace ATMConsoleApp
             }
         }
 
-        private static void ProcessMenuChoice()
+        public static void ProcessMenuChoice()
         {
             switch (Utility.Convert<int>("Enter an option:"))
             {
@@ -123,6 +123,10 @@ namespace ATMConsoleApp
                     }
                     break;
                 case 4:
+                    if(screen == null)
+                    {
+                        screen = new ATMScreen();
+                    }
                     var internalTransfer = screen.CreateInternalTransferTransaction();
                     try
                     {
@@ -142,7 +146,7 @@ namespace ATMConsoleApp
                     break;
                 case 7:
                     ATMScreen.LogoutCustomer();
-                    Utility.PrintMessage("You have successfully logged out. Please collect " +
+                    Utility.PrintMessage("\nYou have successfully logged out. Please collect " +
                         "your ATM card.");
                     Run();
                     break;
@@ -259,7 +263,7 @@ namespace ATMConsoleApp
             }
         }
 
-        private static void ProcessInternalTransfer(InternalTransferTransaction internalTransfer)
+        public static void ProcessInternalTransfer(InternalTransferTransaction internalTransfer)
         {
             if (internalTransfer.Amount <= 0)
             {
@@ -326,16 +330,17 @@ namespace ATMConsoleApp
             return sortedTable;
         }
 
-        public static void ViewTransaction()
+        public static ConsoleTable ViewTransaction()
         {
             var filteredTransactionList = _listOfTransactions.Where(t => t.UserBankAccountId == selectedUser.Id).ToList();
+            var table = new ConsoleTable();
             if (filteredTransactionList.Count <= 0)
             {
                 Utility.PrintMessage("You have no transaction yet.", true);
             }
             else
             {
-                var table = new ConsoleTable("Id", "Transaction Date", "Type", "Description", "Amount " + ATMScreen.currency);
+                table = new ConsoleTable("Id", "Transaction Date", "Type", "Description", "Amount " + ATMScreen.currency);
                 foreach (var transaction in filteredTransactionList)
                 {
                     table.AddRow(transaction.id, transaction.TransactionDate, transaction.TransactionType, transaction.Description, transaction.Amount);
@@ -349,19 +354,21 @@ namespace ATMConsoleApp
                     case "1":
                         Console.WriteLine("\nSorting by amount...");
                         Utility.PrintDotAnimation(false);
-                        sortTableByAmount();
+                        table = sortTableByAmount();
                         Utility.PressEnterToContinue();
                         break;
                     case "2":
                         Console.WriteLine("\nSorting by type...");
                         Utility.PrintDotAnimation(false);
-                        sortTableByType();
+                        table = sortTableByType();
                         Utility.PressEnterToContinue();
                         break;
                     default:
                         break;
                 }
+                return table;
             }
+            return table;
         }
 
         public static void CreateTransaction(long userBankAccountId, string transactionType, decimal transactionAmount, string description)

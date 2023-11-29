@@ -115,7 +115,7 @@ namespace ATMConsoleApp
                 }
                 catch
                 {
-                    PrintMessage("Invalid input. Try again.", false);
+                    PrintMessage("Invalid input. Try again.", false, false);
                 }
             }
             return default;

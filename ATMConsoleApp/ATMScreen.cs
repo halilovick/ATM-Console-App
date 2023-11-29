@@ -16,7 +16,7 @@ namespace ATMConsoleApp
             Utility.PressEnterToContinue();
         }
 
-        internal static User UserLogin()
+        public static User UserLogin()
         {
             User tempUser = new User();
 
@@ -60,14 +60,13 @@ namespace ATMConsoleApp
             Console.WriteLine("--------------------------");
         }
 
-        internal static void LogoutCustomer()
+        public static void LogoutCustomer()
         {
             Console.WriteLine("Thank you for using our ATM!");
             Utility.PrintDotAnimation();
-            Console.Clear();
         }
 
-        internal static int SelectWithdrawalAmount()
+        public static int SelectWithdrawalAmount()
         {
             Console.WriteLine("");
             Console.WriteLine("------------------------------");
@@ -108,7 +107,7 @@ namespace ATMConsoleApp
             }
         }
 
-        internal InternalTransferTransaction CreateInternalTransferTransaction()
+        public InternalTransferTransaction CreateInternalTransferTransaction()
         {
             var internalTransfer = new InternalTransferTransaction();
             internalTransfer.RecipientAccountNumber = Utility.Convert<long>("Enter recipient's account number:");

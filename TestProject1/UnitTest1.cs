@@ -7,6 +7,9 @@ using Assert = NUnit.Framework.Assert;
 using System.IO;
 using System;
 using NUnit.Framework.Constraints;
+using System.Text;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+using System.Runtime.CompilerServices;
 
 namespace TestProject1
 {
@@ -187,6 +190,306 @@ namespace TestProject1
             string[] lines = output.ToString().Split(new[] { "\r\n" }, StringSplitOptions.None);
             string firstLine = lines.Length > 0 ? lines[0] : string.Empty;
             Assert.That(firstLine, Is.EqualTo("Your account balance is: 1000 EUR"));
+        }
+
+        [Test]
+        public void ViewTransactionsTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            Program.CreateTransaction(Program.selectedUser.Id, "Deposit", 100, "Deposit 1");
+            Program.CreateTransaction(Program.selectedUser.Id, "Withdraw", 50, "Withdraw 1");
+            Program.CreateTransaction(Program.selectedUser.Id, "Deposit", 200, "Deposit 2");
+            var output = new StringWriter();
+            Console.SetOut(output);
+            var input = new StringReader("3");
+            Console.SetIn(input);
+            var table = Program.ViewTransaction().ToString();
+            string[] lines = table.Split(new[] { "\r\n" }, StringSplitOptions.None);
+            StringBuilder concatenatedLines = new StringBuilder();
+            for (int i = 0; i < 10; i++)
+            {
+                concatenatedLines.Append(lines[i]);
+                if (i < 9)
+                {
+                    concatenatedLines.Append(Environment.NewLine);
+                }
+            }
+            Assert.That(concatenatedLines.ToString(), Is.EqualTo(table));
+        }
+
+        [Test]
+        public void ViewTransactionsSortAmountTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            Program.CreateTransaction(Program.selectedUser.Id, "Deposit", 100, "Deposit 1");
+            Program.CreateTransaction(Program.selectedUser.Id, "Withdraw", 50, "Withdraw 1");
+            Program.CreateTransaction(Program.selectedUser.Id, "Deposit", 200, "Deposit 2");
+            var output = new StringWriter();
+            Console.SetOut(output);
+            var input = new StringReader("1");
+            Console.SetIn(input);
+            var table = Program.ViewTransaction().ToString();
+            string[] lines = table.Split(new[] { "\r\n" }, StringSplitOptions.None);
+            StringBuilder concatenatedLines = new StringBuilder();
+            for (int i = 0; i < 10; i++)
+            {
+                concatenatedLines.Append(lines[i]);
+                if (i < 9)
+                {
+                    concatenatedLines.Append(Environment.NewLine);
+                }
+            }
+            Assert.That(concatenatedLines.ToString(), Is.EqualTo(table));
+        }
+
+        [Test]
+        public void ViewTransactionsSortTypeTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            Program.CreateTransaction(Program.selectedUser.Id, "Deposit", 100, "Deposit 1");
+            Program.CreateTransaction(Program.selectedUser.Id, "Withdraw", 50, "Withdraw 1");
+            Program.CreateTransaction(Program.selectedUser.Id, "Deposit", 200, "Deposit 2");
+            var output = new StringWriter();
+            Console.SetOut(output);
+            var input = new StringReader("2");
+            Console.SetIn(input);
+            var table = Program.ViewTransaction().ToString();
+            string[] lines = table.Split(new[] { "\r\n" }, StringSplitOptions.None);
+            StringBuilder concatenatedLines = new StringBuilder();
+            for (int i = 0; i < 10; i++)
+            {
+                concatenatedLines.Append(lines[i]);
+                if (i < 9)
+                {
+                    concatenatedLines.Append(Environment.NewLine);
+                }
+            }
+            Assert.That(concatenatedLines.ToString(), Is.EqualTo(table));
+        }
+
+        [Test]
+        public void ViewTransactionsEmptyTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.ViewTransaction();
+            string[] lines = output.ToString().Split(new[] { "\r\n" }, StringSplitOptions.None);
+            string firstLine = lines.Length > 0 ? lines[0] : string.Empty;
+            Assert.That(firstLine.ToString(), Is.EqualTo("You have no transaction yet."));
+        }
+
+        [Test]
+        public void InternalTransferExceptionTest1()
+        {
+            Program.selectedUser = Program.userList[0];
+            InternalTransferTransaction internalTransferTransaction = new InternalTransferTransaction(-10, "Test Name", 111222);
+            var ex = Assert.Throws<System.ArgumentException>(() => Program.ProcessInternalTransfer(internalTransferTransaction));
+            Assert.That(ex.Message, Is.EqualTo("Transfer amount needs to be greater than zero. Please try again."));
+        }
+
+        [Test]
+        public void InternalTransferExceptionTest2()
+        {
+            Program.selectedUser = Program.userList[0];
+            Program.selectedUser.AccountBalance = 100;
+            InternalTransferTransaction internalTransferTransaction = new InternalTransferTransaction(500, "Test Name", 111222);
+            var ex = Assert.Throws<System.ArgumentException>(() => Program.ProcessInternalTransfer(internalTransferTransaction));
+            Assert.That(ex.Message, Is.EqualTo("Transfer failed. Your balance is not enough to transfer 500"));
+        }
+
+        [Test]
+        public void InternalTransferExceptionTest3()
+        {
+            Program.selectedUser = Program.userList[0];
+            Program.selectedUser.AccountBalance = 1000;
+            InternalTransferTransaction internalTransferTransaction = new InternalTransferTransaction(500, "Kerim Halilovic", 0);
+            var ex = Assert.Throws<System.ArgumentException>(() => Program.ProcessInternalTransfer(internalTransferTransaction));
+            Assert.That(ex.Message, Is.EqualTo("Transfer failed. Reciever bank account number is invalid."));
+        }
+
+        [Test]
+        public void InternalTransferExceptionTest4()
+        {
+            Program.selectedUser = Program.userList[0];
+            Program.selectedUser.AccountBalance = 1000;
+            InternalTransferTransaction internalTransferTransaction = new InternalTransferTransaction(500, "Invalid Name", 112233);
+            var ex = Assert.Throws<System.ArgumentException>(() => Program.ProcessInternalTransfer(internalTransferTransaction));
+            Assert.That(ex.Message, Is.EqualTo("Transfer Failed. Recipient's bank account name does not match."));
+        }
+
+        [Test]
+        public void InternalTransferTest()
+        {
+            Program.selectedUser = Program.userList[1];
+            Program.selectedUser.AccountBalance = 1000;
+            InternalTransferTransaction internalTransferTransaction = new InternalTransferTransaction(500, "Kerim Halilovic", 112233);
+            Program.ProcessInternalTransfer(internalTransferTransaction);
+            Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(500));
+        }
+
+        [Test]
+        public void SelectWithdrawalAmountTest()
+        {
+            var input = new StringReader("1");
+            Console.SetIn(input);
+            int selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            Assert.That(selectedAmount, Is.EqualTo(10));
+            input = new StringReader("2");
+            Console.SetIn(input);
+            selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            Assert.That(selectedAmount, Is.EqualTo(20));
+            input = new StringReader("3");
+            Console.SetIn(input);
+            selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            Assert.That(selectedAmount, Is.EqualTo(50));
+            input = new StringReader("4");
+            Console.SetIn(input);
+            selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            Assert.That(selectedAmount, Is.EqualTo(100));
+            input = new StringReader("5");
+            Console.SetIn(input);
+            selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            Assert.That(selectedAmount, Is.EqualTo(500));
+            input = new StringReader("6");
+            Console.SetIn(input);
+            selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            Assert.That(selectedAmount, Is.EqualTo(1000));
+            input = new StringReader("7");
+            Console.SetIn(input);
+            selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            Assert.That(selectedAmount, Is.EqualTo(5000));
+            input = new StringReader("8");
+            Console.SetIn(input);
+            selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            Assert.That(selectedAmount, Is.EqualTo(10000));
+            input = new StringReader("0");
+            Console.SetIn(input);
+            selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            Assert.That(selectedAmount, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void LogoutCustomerTest()
+        {
+            var output = new StringWriter();
+            Console.SetOut(output);
+            ATMScreen.LogoutCustomer();
+            string[] lines = output.ToString().Split(new[] { "\r\n" }, StringSplitOptions.None);
+            string firstLine = lines.Length > 0 ? lines[0] : string.Empty;
+            Assert.That(firstLine.ToString(), Is.EqualTo("Thank you for using our ATM!"));
+        }
+
+        /*[Test]
+        public void UserLoginTest()
+        {
+            var input = new StringReader("111222\n1234\n");
+            Console.SetIn(input);
+            var output = new StringWriter();
+            Console.SetOut(output);
+            var user = ATMScreen.UserLogin();
+            Assert.That(user, Is.EqualTo(Program.userList[0]));
+        }*/
+
+        [Test]
+        public void CreateInternalTransferTest()
+        {
+            var input = new StringReader("112233\n100\nKerim Halilovic");
+            Console.SetIn(input);
+            ATMScreen screen = new ATMScreen();
+            var internalTransferTransaction = screen.CreateInternalTransferTransaction();
+            Assert.That(internalTransferTransaction.RecipientAccountNumber, Is.EqualTo(112233));
+        }
+
+        /*[Test]
+        public void InvalidInputConvertTest()
+        {
+            Utility.Convert<int>("InvalidPrompt");
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Assert.That(output.ToString(), Is.EqualTo("Invalid input. Try again."));
+        }*/ // popravit
+
+        [Test]
+        public void BalanceCheckMenuChoiceTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            Program.selectedUser.AccountBalance = 1000;
+            var input = new StringReader("1");
+            Console.SetIn(input);
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.ProcessMenuChoice();
+            Assert.That(output.ToString().Contains("Your account balance is: 1000 EUR"));
+        }
+
+        [Test]
+        public void PlaceDepositMenuChoiceTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            var input = new StringReader("2\n100\n1");
+            Console.SetIn(input);
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.ProcessMenuChoice();
+            Assert.That(output.ToString().Contains("Only multiples of 5 and 10 euros allowed."));
+            input = new StringReader("2\n101\n1");
+            Console.SetIn(input);
+            output = new StringWriter();
+            Console.SetOut(output);
+            Program.ProcessMenuChoice();
+            Assert.That(output.ToString().Contains("Enter deposit amount in multiples of 5 or 10. Please try again."));
+        }
+
+        [Test]
+        public void WithdrawMoneyMenuChoiceTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            Program.selectedUser.AccountBalance = 100;
+            var input = new StringReader("3\n1");
+            Console.SetIn(input);
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.ProcessMenuChoice();
+            Assert.That(output.ToString().Contains("You have successfully withdrawn 10"));
+            input = new StringReader("3\n5");
+            Console.SetIn(input);
+            output = new StringWriter();
+            Console.SetOut(output);
+            Program.ProcessMenuChoice();
+            Assert.That(output.ToString().Contains("Withdrawal failed. Your balance is too low to withdraw 500"));
+        }
+
+        [Test]
+        public void ProcessTransferMenuChoiceTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            Program.selectedUser.AccountBalance = 100;
+            var input = new StringReader("4\n112233\n100\nKerim Halilovic");
+            Console.SetIn(input);
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.ProcessMenuChoice();
+            Assert.That(output.ToString().Contains("You have successfully transfered 100 to Kerim Halilovic"));
+            input = new StringReader("4\n112233\n-5\nKerim Halilovic\n");
+            Console.SetIn(input);
+            output = new StringWriter();
+            Console.SetOut(output);
+            Program.ProcessMenuChoice();
+            Assert.That(output.ToString().Contains("Transfer amount needs to be greater than zero. Please try again."));
+        }
+
+        [Test]
+        public void ViewTransactionMenuChoiceTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            Program._listOfTransactions = new List<TransactionProcess>();
+            var input = new StringReader("5\n");
+            Console.SetIn(input);
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.ProcessMenuChoice();
+            Assert.That(output.ToString().Contains("You have no transaction yet."));
         }
     }
 }
