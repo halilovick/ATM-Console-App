@@ -367,6 +367,10 @@ namespace TestProject1
             Console.SetIn(input);
             selectedAmount = ATMScreen.SelectWithdrawalAmount();
             Assert.That(selectedAmount, Is.EqualTo(0));
+            input = new StringReader("9");
+            Console.SetIn(input);
+            selectedAmount = ATMScreen.SelectWithdrawalAmount();
+            Assert.That(selectedAmount, Is.EqualTo(-1));
         }
 
         [Test]
@@ -491,5 +495,42 @@ namespace TestProject1
             Program.ProcessMenuChoice();
             Assert.That(output.ToString().Contains("You have no transaction yet."));
         }
+
+        [Test]
+        public void DisplayAppMenuTest()
+        {
+            var output = new StringWriter();
+            Console.SetOut(output);
+            ATMScreen.DisplayAppMenu(false);
+            Assert.That(output.ToString().Contains("-------VVS ATM menu-------"));
+        }
+
+        [Test]
+        public void ConsoleMethodsTest()
+        {
+            var output = new StringWriter();
+            Console.SetOut(output);
+            var input = new StringReader("\n");
+            Console.SetIn(input);
+            ATMScreen.WelcomeCustomer("Test");
+            ATMScreen.LoginAnimation();
+            input = new StringReader("\n");
+            Console.SetIn(input);
+            ATMScreen.WelcomeScreen(false);
+            Assert.That(output.ToString().Contains("Welcome Test"));
+            Assert.That(output.ToString().Contains("Checking card number and PIN..."));
+            Assert.That(output.ToString().Contains("Please insert your card"));
+        }
+
+        /*[Test]
+        public void GetPINInputTest()
+        {
+            var output = new StringWriter();
+            Console.SetOut(output);
+            var input = new StringReader("1\n2\n3\n4\n");
+            Console.SetIn(input);
+            var pin = Utility.GetPINInput("Enter your card PIN");
+            Assert.That(pin, Is.EqualTo("1234"));
+        }*/
     }
 }

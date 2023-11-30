@@ -6,9 +6,12 @@ namespace ATMConsoleApp
     public class ATMScreen
     {
         internal const string currency = "EUR ";
-        internal static void WelcomeScreen()
+        public static void WelcomeScreen(bool clearConsole = true)
         {
-            Console.Clear();
+            if (clearConsole)
+            {
+                Console.Clear();
+            }
             Console.Title = "VVS Bank ATM";
 
             Console.WriteLine("\n-----------------Welcome to VVS Bank-----------------\n");
@@ -26,13 +29,13 @@ namespace ATMConsoleApp
             return tempUser;
         }
 
-        internal static void LoginAnimation()
+        public static void LoginAnimation()
         {
             Console.WriteLine("\nChecking card number and PIN...");
             Utility.PrintDotAnimation();
         }
 
-        internal static void WelcomeCustomer(string fullName)
+        public static void WelcomeCustomer(string fullName)
         {
             Console.WriteLine($"Welcome {fullName}");
             Utility.PressEnterToContinue();
@@ -44,9 +47,12 @@ namespace ATMConsoleApp
         }
 
 
-        internal static void DisplayAppMenu()
+        public static void DisplayAppMenu(bool clearConsole = true)
         {
-            Console.Clear();
+            if (clearConsole)
+            {
+                Console.Clear();
+            }
             Console.WriteLine("-------VVS ATM menu-------");
             Console.WriteLine(":                        :");
             Console.WriteLine(": 1. View Balance        :");
