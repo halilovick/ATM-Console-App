@@ -123,7 +123,7 @@ namespace ATMConsoleApp
                     }
                     break;
                 case 4:
-                    if(screen == null)
+                    if (screen == null)
                     {
                         screen = new ATMScreen();
                     }
@@ -141,8 +141,7 @@ namespace ATMConsoleApp
                     ViewTransaction();
                     break;
                 case 6:
-                    string pin = ATMScreen.ChangePIN();
-                    ChangePin(pin, selectedUser.Id);
+                    ViewAccountInformation();
                     break;
                 case 7:
                     ATMScreen.LogoutCustomer();
@@ -388,7 +387,17 @@ namespace ATMConsoleApp
 
         public static void ViewAccountInformation()
         {
-
+            ATMScreen.DisplayAccountInformation(selectedUser.FullName, selectedUser.CardNumber, selectedUser.AccountNumber);
+            Console.WriteLine("\nPress 1 to change your PIN, 2 to continue...");
+            switch (Console.ReadLine())
+            {
+                case "1":
+                    string pin = ATMScreen.ChangePIN();
+                    ChangePin(pin, selectedUser.Id);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

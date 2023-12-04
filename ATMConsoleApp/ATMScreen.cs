@@ -46,6 +46,14 @@ namespace ATMConsoleApp
             return Convert.ToString(Utility.GetPINInput("Enter your new PIN"));
         }
 
+        public static void DisplayAccountInformation(string fullName, long cardNumber, long accountNumber)
+        {
+            Console.WriteLine("\nYour account information: ");
+            Console.WriteLine($"Name: {fullName}");
+            Console.WriteLine($"Account number: {accountNumber}");
+            Console.WriteLine($"Card number: {cardNumber}");
+        }
+
 
         public static void DisplayAppMenu(bool clearConsole = true)
         {
@@ -53,17 +61,17 @@ namespace ATMConsoleApp
             {
                 Console.Clear();
             }
-            Console.WriteLine("-------VVS ATM menu-------");
-            Console.WriteLine(":                        :");
-            Console.WriteLine(": 1. View Balance        :");
-            Console.WriteLine(": 2. Deposit Money       :");
-            Console.WriteLine(": 3. Withdraw Money      :");
-            Console.WriteLine(": 4. Transfer Money      :");
-            Console.WriteLine(": 5. View Transactions   :");
-            Console.WriteLine(": 6. Change PIN          :");
-            Console.WriteLine(": 7. Logout              :");
-            Console.WriteLine(":                        :");
-            Console.WriteLine("--------------------------");
+            Console.WriteLine("--------------VVS ATM menu--------------");
+            Console.WriteLine(":                                      :");
+            Console.WriteLine(": 1. View Balance                      :");
+            Console.WriteLine(": 2. Deposit Money                     :");
+            Console.WriteLine(": 3. Withdraw Money                    :");
+            Console.WriteLine(": 4. Transfer Money                    :");
+            Console.WriteLine(": 5. View Transactions                 :");
+            Console.WriteLine(": 6. View Account Information          :");
+            Console.WriteLine(": 7. Logout                            :");
+            Console.WriteLine(":                                      :");
+            Console.WriteLine("----------------------------------------");
         }
 
         public static void LogoutCustomer()
