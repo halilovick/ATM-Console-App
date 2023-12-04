@@ -532,5 +532,35 @@ namespace TestProject1
             var pin = Utility.GetPINInput("Enter your card PIN");
             Assert.That(pin, Is.EqualTo("1234"));
         }*/
+
+        //Test Driven Development
+        [Test]
+        public void ViewAccountInformationTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            var input = new StringReader("6\n");
+            Console.SetIn(input);
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.ProcessMenuChoice();
+            Assert.That(output.ToString().Contains("\nYour account information: "));
+            Assert.That(output.ToString().Contains($"Name: {Program.selectedUser.FullName}"));
+            Assert.That(output.ToString().Contains($"Account number: {Program.selectedUser.AccountNumber}"));
+            Assert.That(output.ToString().Contains($"Card number: {Program.selectedUser.CardNumber}"));
+        }
+
+        [Test]
+        public void ViewAccountInformationOptionTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            var input = new StringReader("2");
+            Console.SetIn(input);
+            Program.ViewAccountInformation();
+            var output = new StringWriter();
+            Console.SetOut(output);
+            ATMScreen.DisplayAppMenu(false);
+            Assert.That(output.ToString().Contains("-------VVS ATM menu-------"));
+        }
+
     }
 }

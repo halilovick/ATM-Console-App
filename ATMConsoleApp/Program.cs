@@ -385,5 +385,10 @@ namespace ATMConsoleApp
 
             _listOfTransactions.Add(transaction);
         }
+
+        public static void ViewAccountInformation()
+        {
+
+        }
     }
 }
