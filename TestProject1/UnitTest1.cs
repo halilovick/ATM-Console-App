@@ -10,6 +10,7 @@ using NUnit.Framework.Constraints;
 using System.Text;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace TestProject1
 {
@@ -44,37 +45,6 @@ namespace TestProject1
         }
 
         [Test]
-        public void DepositMoneyTest()
-        {
-            Program.selectedUser = Program.userList[0];
-            var balanceBeforeDeposit = Program.selectedUser.AccountBalance;
-            Program.PlaceDeposit(100);
-            Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit + 100));
-        }
-
-        [Test]
-        public void DepositMoneyConsoleTest()
-        {
-            Program.selectedUser = Program.userList[0];
-            var balanceBeforeDeposit = Program.selectedUser.AccountBalance;
-            var input = new StringReader("100\n1");
-            Console.SetIn(input);
-            Program.PlaceDeposit();
-            Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit + 100));
-        }
-
-        [Test]
-        public void DepositMoneyCancelTest()
-        {
-            Program.selectedUser = Program.userList[0];
-            var balanceBeforeDeposit = Program.selectedUser.AccountBalance;
-            var input = new StringReader("100\n5");
-            Console.SetIn(input);
-            Program.PlaceDeposit();
-            Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit));
-        }
-
-        [Test]
         public void WithdrawMoneyTest()
         {
             Program.selectedUser = Program.userList[0];
@@ -99,24 +69,6 @@ namespace TestProject1
             Program.selectedUser.AccountBalance = 1000;
             var ex = Assert.Throws<System.ArgumentException>( () => Program.MakeWithdrawal(249));
             Assert.That(ex.Message, Is.EqualTo("You can only withdraw amount in multiples of 5 or 10 euros. Please try again."));
-        }
-
-
-        [Test]
-        public void PlaceDepositExceptionTest()
-        {
-            Program.selectedUser = Program.userList[0];
-            var ex = Assert.Throws<System.ArgumentException>(() => Program.PlaceDeposit(2001));
-            Assert.That(ex.Message, Is.EqualTo("Amount needs to be a number between 0 and 2000. Please try again."));
-        }
-
-
-        [Test]
-        public void PlaceDepositExceptionTest2()
-        {
-            Program.selectedUser= Program.userList[0];
-            var ex = Assert.Throws<System.ArgumentException>(() => Program.PlaceDeposit(139));
-            Assert.That(ex.Message, Is.EqualTo("Enter deposit amount in multiples of 5 or 10. Please try again."));
         }
 
         [Test]
@@ -561,6 +513,74 @@ namespace TestProject1
             ATMScreen.DisplayAppMenu(false);
             Assert.That(output.ToString().Contains("-------VVS ATM menu-------"));
         }
+
+        //TC1 amount = -5
+        [Test]
+        public void PlaceDepositTest1()
+        {
+            Program.selectedUser = Program.userList[0];
+            var balanceBeforeDeposit = Program.selectedUser.AccountBalance;
+            var input = new StringReader("-5\n1\n");
+            Console.SetIn(input);
+            var ex = Assert.Throws<System.ArgumentException>(() => Program.PlaceDeposit());
+            Assert.That(ex.Message, Is.EqualTo("Amount needs to be a number between 0 and 2000. Please try again."));
+            Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit));
+        }
+
+        //TC2 amount = 2001
+        [Test]
+        public void PlaceDepositTest2()
+        {
+            Program.selectedUser = Program.userList[0];
+            var balanceBeforeDeposit = Program.selectedUser.AccountBalance;
+            var input = new StringReader("2001\n1\n");
+            Console.SetIn(input);
+            var ex = Assert.Throws<System.ArgumentException>( () => Program.PlaceDeposit());
+            Assert.That(ex.Message, Is.EqualTo("Amount needs to be a number between 0 and 2000. Please try again."));
+            Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit));
+        }
+
+        //TC3 amount = 43
+        [Test]
+        public void PlaceDepositTest3()
+        {
+            Program.selectedUser = Program.userList[0];
+            var balanceBeforeDeposit = Program.selectedUser.AccountBalance;
+            var input = new StringReader("43\n1\n");
+            Console.SetIn(input);
+            var ex = Assert.Throws<System.ArgumentException>(() => Program.PlaceDeposit());
+            Assert.That(ex.Message, Is.EqualTo("Enter deposit amount in multiples of 5 or 10. Please try again."));
+            Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit));
+        }
+
+        //TC4 amount = 500
+        [Test]
+        public void PlaceDepositTest4()
+        {
+            Program.selectedUser = Program.userList[0];
+            var balanceBeforeDeposit = Program.selectedUser.AccountBalance;
+            var input = new StringReader("500\n1\n");
+            Console.SetIn(input);
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.PlaceDeposit();
+            Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit + 500));
+        }
+
+        //TC5 amount = 500, cancel deposit
+        [Test]
+        public void PlaceDepositTest5()
+        {
+            Program.selectedUser = Program.userList[0];
+            var balanceBeforeDeposit = Program.selectedUser.AccountBalance;
+            var input = new StringReader("500\n5\n");
+            Console.SetIn(input);
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.PlaceDeposit();
+            Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit));
+        }
+
 
     }
 }

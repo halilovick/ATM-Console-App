@@ -160,26 +160,19 @@ namespace ATMConsoleApp
             Utility.PrintMessage($"Your account balance is: {selectedUser.AccountBalance} EUR");
         }
 
-        public static void PlaceDeposit(int amount = -1)
+        public static void PlaceDeposit()
         {
             Console.WriteLine("\nOnly multiples of 5 and 10 euros allowed.\n");
             var transactionAmount = 0;
-            if (amount == -1)
-            {
-                transactionAmount = Utility.Convert<int>($"Enter an amount {ATMScreen.currency}");
-                Console.WriteLine("\nChecking and counting bank notes.");
-                Utility.PrintDotAnimation();
-                Console.WriteLine("");
+            transactionAmount = Utility.Convert<int>($"Enter an amount {ATMScreen.currency}");
+            Console.WriteLine("\nChecking and counting bank notes.");
+            Utility.PrintDotAnimation();
+            Console.WriteLine("");
 
-                if (!ConfirmDeposit(transactionAmount))
-                {
-                    Utility.PrintMessage($"You have cancelled your action.", false);
-                    return;
-                }
-            }
-            else
+            if (!ConfirmDeposit(transactionAmount))
             {
-                transactionAmount = amount;
+                Utility.PrintMessage($"You have cancelled your action.", false);
+                return;
             }
 
             if (transactionAmount <= 0 || transactionAmount > 2000)
@@ -195,12 +188,12 @@ namespace ATMConsoleApp
 
             selectedUser.AccountBalance += transactionAmount;
 
-            if (amount == -1)
-            {
-                Utility.PrintMessage($"Your deposit of {transactionAmount} was " +
-                $"succesful.", true, false);
-                Utility.PrintDotAnimation();
-            }
+            
+            
+            Utility.PrintMessage($"Your deposit of {transactionAmount} was " +
+            $"succesful.", true, false);
+            Utility.PrintDotAnimation();
+            
         }
 
         public static bool ConfirmDeposit(int amount)
