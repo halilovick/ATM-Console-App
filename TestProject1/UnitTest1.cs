@@ -73,7 +73,7 @@ namespace TestProject1
         {
             Program.selectedUser = Program.userList[0];
             Program.selectedUser.AccountBalance = 1000;
-            var ex = Assert.Throws<System.ArgumentException>( () => Program.MakeWithdrawal(249));
+            var ex = Assert.Throws<System.ArgumentException>(() => Program.MakeWithdrawal(249));
             Assert.That(ex.Message, Is.EqualTo("You can only withdraw amount in multiples of 5 or 10 euros. Please try again."));
         }
 
@@ -519,6 +519,50 @@ namespace TestProject1
             ATMScreen.DisplayAppMenu(false);
             Assert.That(output.ToString().Contains("-------VVS ATM menu-------"));
         }
+        [Test]
+        public void DisplayExchangeRateTest()
+        {
+            Program.selectedUser = Program.userList[1];
+            var input = new StringReader("7\n");
+            Console.SetIn(input);
+            List<string> expectedExchangeRates = new List<string>
+            {
+                "EUR to USD: 1.08",
+                "EUR to AUD: 1.65",
+                "EUR to BAM: 1.96",
+                "EUR to CAD: 1.47",
+                "EUR to DKK: 7.46",
+                "EUR to HUF: 379.16",
+                "EUR to JPY: 159.13",
+                "EUR to NOK: 11.77",
+                "EUR to SEK: 11.29",
+                "EUR to CHF: 0.95",
+                "EUR to GBP: 0.86",
+                "EUR to RUB: 99.55",
+                "EUR to CNY: 7.72",
+                "EUR to RSD: 117.22"
+            };
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.DisplayExchangeRate();
+            Assert.That(output.ToString().Contains("\nExchange rate"));
+            foreach (var expectedRate in expectedExchangeRates)
+            {
+                Assert.That(output.ToString().Contains(expectedRate));
+            }
+        }
+
+        [Test]
+        public void ConvertCurrencyTest()
+        {
+            var input = new StringReader("100\n3\n"); 
+            Console.SetIn(input);
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.ConvertCurrency();
+            string outputString = output.ToString();
+            Assert.IsTrue(outputString.Contains("Converted amount: 196 BAM"));
+        }
 
         //TC1 amount = -5
         [Test]
@@ -541,7 +585,7 @@ namespace TestProject1
             var balanceBeforeDeposit = Program.selectedUser.AccountBalance;
             var input = new StringReader("2001\n1\n");
             Console.SetIn(input);
-            var ex = Assert.Throws<System.ArgumentException>( () => Program.PlaceDeposit());
+            var ex = Assert.Throws<System.ArgumentException>(() => Program.PlaceDeposit());
             Assert.That(ex.Message, Is.EqualTo("Amount needs to be a number between 0 and 2000. Please try again."));
             Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit));
         }
@@ -616,7 +660,7 @@ namespace TestProject1
                 Program.MakeWithdrawal(withdrawalAmount);
                 result = true;
             }
-            catch (Exception){}
+            catch (Exception) { }
 
             Assert.AreEqual(expectedResult, result);
         }
@@ -664,13 +708,15 @@ namespace TestProject1
                 Program.ProcessInternalTransfer(internalTransfer);
                 result = true;
             }
-            catch (Exception){}
+            catch (Exception) { }
             Assert.AreEqual(expectedResult, result);
         }
 
 
+
+
         //White Box testing for method MakeWithdrawal
-        
+
         // Test Case 1: Test successful withdrawal 
         // Amount = 50, Balance = 1000
         [Test]

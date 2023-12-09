@@ -95,6 +95,16 @@ namespace ATMConsoleApp
             }
         }
 
+        public static void DisplayExchangeRate()
+        {
+
+        }
+
+        public static void ConvertCurrency()
+        {
+
+        }
+
         public static void ProcessMenuChoice()
         {
             switch (Utility.Convert<int>("Enter an option:"))
@@ -188,12 +198,12 @@ namespace ATMConsoleApp
 
             selectedUser.AccountBalance += transactionAmount;
 
-            
-            
+
+
             Utility.PrintMessage($"Your deposit of {transactionAmount} was " +
             $"succesful.", true, false);
             Utility.PrintDotAnimation();
-            
+
         }
 
         public static bool ConfirmDeposit(int amount)
@@ -292,6 +302,7 @@ namespace ATMConsoleApp
                 $"{internalTransfer.RecipientAccountName}", true);
 
         }
+        
 
         public static ConsoleTable sortTableByAmount()
         {

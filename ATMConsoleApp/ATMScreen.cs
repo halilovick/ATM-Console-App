@@ -1,6 +1,9 @@
 ﻿using ATMConsoleApp.Models;
 using System;
 
+sing ATMConsoleApp.Models;
+using System;
+
 namespace ATMConsoleApp
 {
     public class ATMScreen
