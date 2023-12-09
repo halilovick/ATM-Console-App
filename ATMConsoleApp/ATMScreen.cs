@@ -1,7 +1,7 @@
 ﻿using ATMConsoleApp.Models;
 using System;
 
-sing ATMConsoleApp.Models;
+using ATMConsoleApp.Models;
 using System;
 
 namespace ATMConsoleApp

@@ -13,6 +13,7 @@ namespace ATMConsoleApp
         public static List<User> userList;
         public static User selectedUser;
         public static List<TransactionProcess> _listOfTransactions;
+        private static List<ExchangeRate> exchangeRateList;
         private static ATMScreen screen;
         static void Main()
         {
@@ -54,6 +55,24 @@ namespace ATMConsoleApp
                 new User{Id=4, FullName = "Bakir Pljakic", AccountNumber=115599,CardNumber=777888, CardPin=HashFunction("1234"),AccountBalance=30000.00m}
             };
             _listOfTransactions = new List<TransactionProcess>();
+            exchangeRateList = new List<ExchangeRate>
+            {
+                new ExchangeRate{CurrencyPair="EUR to USD", Rate = 1.08},
+                new ExchangeRate{CurrencyPair="EUR to AUD", Rate = 1.65},
+                new ExchangeRate{CurrencyPair="EUR to BAM", Rate = 1.96},
+                new ExchangeRate{CurrencyPair="EUR to CAD", Rate = 1.47},
+                new ExchangeRate{CurrencyPair="EUR to DKK", Rate = 7.46},
+                new ExchangeRate{CurrencyPair="EUR to HUF", Rate = 379.16},
+                new ExchangeRate{CurrencyPair="EUR to JPY", Rate = 159.13},
+                new ExchangeRate{CurrencyPair="EUR to NOK", Rate = 11.77},
+                new ExchangeRate{CurrencyPair="EUR to SEK", Rate = 11.29},
+                new ExchangeRate{CurrencyPair="EUR to CHF", Rate = 0.95},
+                new ExchangeRate{CurrencyPair="EUR to GBP", Rate = 0.86},
+                new ExchangeRate{CurrencyPair="EUR to RUB", Rate = 99.55},
+                new ExchangeRate{CurrencyPair="EUR to CNY", Rate = 7.72},
+                new ExchangeRate{CurrencyPair="EUR to RSD", Rate = 117.22}
+            };
+
         }
 
         public static bool CheckUserCredentials()
@@ -97,13 +116,35 @@ namespace ATMConsoleApp
 
         public static void DisplayExchangeRate()
         {
-
+            Console.WriteLine("\nExchange rate");
+            for (int i = 0; i < exchangeRateList.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {exchangeRateList[i].CurrencyPair}: {exchangeRateList[i].Rate}");
+            }
         }
-
         public static void ConvertCurrency()
         {
+            DisplayExchangeRate();
+            Console.WriteLine("\nEnter the amount in EUR to convert:");
+            int amountInEuro;
+            while (!int.TryParse(Console.ReadLine(), out amountInEuro) || amountInEuro <= 0)
+            {
+                Console.WriteLine("Please enter a valid amount in EUR:");
+            }
 
+            Console.WriteLine("\nChoose a currency to convert to:");
+            int choice;
+            while (!int.TryParse(Console.ReadLine(), out choice) || choice < 1 || choice > exchangeRateList.Count)
+            {
+                Console.WriteLine("Invalid selection. Please choose a valid currency to convert to:");
+            }
+
+            ExchangeRate selectedCurrency = exchangeRateList[choice - 1];
+            double convertedAmount = amountInEuro * selectedCurrency.Rate;
+            Console.WriteLine($"\nConverted amount: {convertedAmount}");
+            Utility.PressEnterToContinue();
         }
+
 
         public static void ProcessMenuChoice()
         {
@@ -154,6 +195,9 @@ namespace ATMConsoleApp
                     ViewAccountInformation();
                     break;
                 case 7:
+                    ConvertCurrency();
+                    break;
+                case 8:
                     ATMScreen.LogoutCustomer();
                     Utility.PrintMessage("\nYou have successfully logged out. Please collect " +
                         "your ATM card.");
@@ -170,19 +214,26 @@ namespace ATMConsoleApp
             Utility.PrintMessage($"Your account balance is: {selectedUser.AccountBalance} EUR");
         }
 
-        public static void PlaceDeposit()
+        public static void PlaceDeposit(int amount = -1)
         {
             Console.WriteLine("\nOnly multiples of 5 and 10 euros allowed.\n");
             var transactionAmount = 0;
-            transactionAmount = Utility.Convert<int>($"Enter an amount {ATMScreen.currency}");
-            Console.WriteLine("\nChecking and counting bank notes.");
-            Utility.PrintDotAnimation();
-            Console.WriteLine("");
-
-            if (!ConfirmDeposit(transactionAmount))
+            if (amount == -1)
             {
-                Utility.PrintMessage($"You have cancelled your action.", false);
-                return;
+                transactionAmount = Utility.Convert<int>($"Enter an amount {ATMScreen.currency}");
+                Console.WriteLine("\nChecking and counting bank notes.");
+                Utility.PrintDotAnimation();
+                Console.WriteLine("");
+
+                if (!ConfirmDeposit(transactionAmount))
+                {
+                    Utility.PrintMessage($"You have cancelled your action.", false);
+                    return;
+                }
+            }
+            else
+            {
+                transactionAmount = amount;
             }
 
             if (transactionAmount <= 0 || transactionAmount > 2000)
@@ -198,12 +249,12 @@ namespace ATMConsoleApp
 
             selectedUser.AccountBalance += transactionAmount;
 
-
-
-            Utility.PrintMessage($"Your deposit of {transactionAmount} was " +
-            $"succesful.", true, false);
-            Utility.PrintDotAnimation();
-
+            if (amount == -1)
+            {
+                Utility.PrintMessage($"Your deposit of {transactionAmount} was " +
+                $"succesful.", true, false);
+                Utility.PrintDotAnimation();
+            }
         }
 
         public static bool ConfirmDeposit(int amount)
@@ -302,7 +353,6 @@ namespace ATMConsoleApp
                 $"{internalTransfer.RecipientAccountName}", true);
 
         }
-        
 
         public static ConsoleTable sortTableByAmount()
         {
