@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TestCases>
+	<TestCase>
+		<TransferAmount>50</TransferAmount>
+		<RecipientAccountNumber>445566</RecipientAccountNumber>
+		<RecipientAccountName>Emir Kalajdzija</RecipientAccountName>
+		<ExpectedResult>true</ExpectedResult>
+	</TestCase>
+	<TestCase>
+		<TransferAmount>200</TransferAmount>
+		<RecipientAccountNumber>778899</RecipientAccountNumber>
+		<RecipientAccountName>Emir Salkic</RecipientAccountName>
+		<ExpectedResult>true</ExpectedResult>
+	</TestCase>
+	<TestCase>
+		<TransferAmount>0</TransferAmount>
+		<RecipientAccountNumber>115599</RecipientAccountNumber>
+		<RecipientAccountName>Bakir Pljakic</RecipientAccountName>
+		<ExpectedResult>false</ExpectedResult>
+	</TestCase>
+	<TestCase>
+		<TransferAmount>-10</TransferAmount>
+		<RecipientAccountNumber>111222</RecipientAccountNumber>
+		<RecipientAccountName>Kerim Halilovic</RecipientAccountName>
+		<ExpectedResult>false</ExpectedResult>
+	</TestCase>
+</TestCases>

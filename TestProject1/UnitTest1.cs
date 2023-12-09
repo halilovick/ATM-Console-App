@@ -16,6 +16,7 @@ using System.Formats.Asn1;
 using CsvHelper;
 using System.Globalization;
 using System.Linq;
+using System.Xml;
 
 namespace TestProject1
 {
@@ -625,6 +626,46 @@ namespace TestProject1
         {
             public int WithdrawalAmount { get; set; }
             public bool ExpectedResult { get; set; }
+        }
+
+        // Test data source for internal transfer testing from XML
+        private static IEnumerable InternalTransferTestCasesFromXml
+        {
+            get
+            {
+                var xmlDoc = new XmlDocument();
+                xmlDoc.Load("TestData.xml");
+
+                foreach (XmlNode testCaseNode in xmlDoc.DocumentElement.ChildNodes)
+                {
+                    decimal transferAmount = decimal.Parse(testCaseNode.SelectSingleNode("TransferAmount").InnerText);
+                    int recipientAccountNumber = int.Parse(testCaseNode.SelectSingleNode("RecipientAccountNumber").InnerText);
+                    string recipientAccountName = testCaseNode.SelectSingleNode("RecipientAccountName").InnerText;
+                    bool expectedResult = bool.Parse(testCaseNode.SelectSingleNode("ExpectedResult").InnerText);
+
+                    yield return new TestCaseData(transferAmount, recipientAccountNumber, recipientAccountName, expectedResult);
+                }
+            }
+        }
+
+        [Test, TestCaseSource(nameof(InternalTransferTestCasesFromXml))]
+        public void InternalTransferFromXmlTest(decimal transferAmount, int recipientAccountNumber, string recipientAccountName, bool expectedResult)
+        {
+            Program.selectedUser = Program.userList[0];
+            bool result = false;
+            try
+            {
+                var internalTransfer = new InternalTransferTransaction
+                {
+                    Amount = transferAmount,
+                    RecipientAccountNumber = recipientAccountNumber,
+                    RecipientAccountName = recipientAccountName
+                };
+                Program.ProcessInternalTransfer(internalTransfer);
+                result = true;
+            }
+            catch (Exception){}
+            Assert.AreEqual(expectedResult, result);
         }
 
     }
