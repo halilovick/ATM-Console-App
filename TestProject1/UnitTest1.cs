@@ -11,6 +11,11 @@ using System.Text;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Collections;
+using System.Formats.Asn1;
+using CsvHelper;
+using System.Globalization;
+using System.Linq;
 
 namespace TestProject1
 {
@@ -581,6 +586,46 @@ namespace TestProject1
             Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit));
         }
 
+        //Data driven testing
+        private static IEnumerable WithdrawalTestCases
+        {
+            get
+            {
+                using (var reader = new StreamReader("TestData.csv"))
+                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                {
+                    var records = csv.GetRecords<WithdrawalTestData>().ToList();
+                    foreach (var record in records)
+                    {
+                        yield return new TestCaseData(record.WithdrawalAmount, record.ExpectedResult);
+                    }
+                }
+            }
+        }
+
+        [Test, TestCaseSource(nameof(WithdrawalTestCases))]
+        public void MakeWithdrawalTest(int withdrawalAmount, bool expectedResult)
+        {
+            Program.InitializeData();
+            Program.selectedUser = Program.userList[0];
+
+            bool result = false;
+            try
+            {
+                Program.MakeWithdrawal(withdrawalAmount);
+                result = true;
+            }
+            catch (Exception){}
+
+            Assert.AreEqual(expectedResult, result);
+        }
+
+        // Class for reading csv file
+        private class WithdrawalTestData
+        {
+            public int WithdrawalAmount { get; set; }
+            public bool ExpectedResult { get; set; }
+        }
 
     }
 }
