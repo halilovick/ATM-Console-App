@@ -1,9 +1,6 @@
 ﻿using ATMConsoleApp.Models;
 using System;
 
-using ATMConsoleApp.Models;
-using System;
-
 namespace ATMConsoleApp
 {
     public class ATMScreen
@@ -72,7 +69,8 @@ namespace ATMConsoleApp
             Console.WriteLine(": 4. Transfer Money                    :");
             Console.WriteLine(": 5. View Transactions                 :");
             Console.WriteLine(": 6. View Account Information          :");
-            Console.WriteLine(": 7. Logout                            :");
+            Console.WriteLine(": 7. Exchange rate                     :");
+            Console.WriteLine(": 8. Logout                            :");
             Console.WriteLine(":                                      :");
             Console.WriteLine("----------------------------------------");
         }
