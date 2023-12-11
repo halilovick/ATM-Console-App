@@ -22,6 +22,18 @@ namespace TestProject1
 {
     public class Tests
     {
+        public interface MockInterface
+        {
+            int Id { get; set; }
+            string CardPin { get; set; }
+        }
+
+        public class Mock : MockInterface
+        {
+            public int Id { get; set; }
+            public string CardPin { get; set; }
+            
+        }
         [SetUp]
         public void Setup()
         {
@@ -37,6 +49,17 @@ namespace TestProject1
             Program.selectedUser = Program.userList[1];
             Program.ChangePin("9191", Program.selectedUser.Id);
             Assert.Pass(Program.selectedUser.CardPin, Program.HashFunction("9191"));
+        }
+
+        //Zamjenski objekat
+        [Test]
+        public void ChangePinMethodMockTest()
+        {
+            var mockUser = new Mock();
+            mockUser.CardPin = "1234";
+            mockUser.Id = 1;
+            Program.ChangePin("6666", mockUser.Id);
+            Assert.Pass(mockUser.CardPin, Program.HashFunction("6666"));
         }
 
         [Test]
