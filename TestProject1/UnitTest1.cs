@@ -74,6 +74,25 @@ namespace TestProject1
             Assert.That(Program._listOfTransactions[numberOfTransactions].Amount, Is.EqualTo(100));
         }
 
+        // Zamjenski objekat
+        [Test]
+        public void CreateTransactionMockTest()
+        {
+            var mockUser = new Mock();
+            mockUser.CardPin = "1234";
+            mockUser.Id = 1;
+
+            Program.CreateTransaction(mockUser.Id, "Withdrawal", 50, "Withdrawal transaction");
+
+            Assert.AreEqual(1, Program._listOfTransactions.Count);
+            var transaction = Program._listOfTransactions[0];
+            Assert.AreEqual(mockUser.Id, transaction.UserBankAccountId);
+            Assert.AreEqual("Withdrawal", transaction.TransactionType);
+            Assert.AreEqual(50, transaction.Amount);
+            Assert.AreEqual("Withdrawal transaction", transaction.Description);
+        }
+
+
         [Test]
         public void WithdrawMoneyTest()
         {
