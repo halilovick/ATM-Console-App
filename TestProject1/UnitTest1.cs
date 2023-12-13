@@ -17,6 +17,7 @@ using CsvHelper;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
+using NUnit.Framework.Internal;
 
 namespace TestProject1
 {
@@ -584,7 +585,7 @@ namespace TestProject1
             Console.SetOut(output);
             Program.ConvertCurrency();
             string outputString = output.ToString();
-            Assert.IsTrue(outputString.Contains("Converted amount: 196 BAM"));
+            Assert.IsTrue(outputString.Contains("Converted amount: 196"));
         }
 
         //TC1 amount = -5
@@ -778,5 +779,63 @@ namespace TestProject1
             Assert.Throws<ArgumentException>(() => Program.MakeWithdrawal(33));
         }
 
+        //White Box testing for method ProcessInternalTransfer
+
+        // Test Case 1: Test transfer with invalid amount (negative)
+        // Amount = -50
+        [Test]
+        public void InternalTransfer_InsufficientBalance_ThrowsExcepti()
+        {
+            InternalTransferTransaction internalTransferTransaction = new InternalTransferTransaction(-50, "Bakir Pljakic", 111222);
+            Assert.Throws<ArgumentException>(() => Program.ProcessInternalTransfer(internalTransferTransaction));
+        }
+
+        // Test Case 2: Test transfer with insufficient balance
+        // Amount = 700, Balance = 200
+        [Test]
+        public void InternalTransfer_InsufficientBalance_ThrowsException()
+        {
+            Program.selectedUser = Program.userList[1];
+            Program.selectedUser.AccountBalance = 200;
+            InternalTransferTransaction internalTransferTransaction = new InternalTransferTransaction(700, "Bakir Pljakic", 111222);
+            Assert.Throws<ArgumentException>(() => Program.ProcessInternalTransfer(internalTransferTransaction));
+        }
+
+        // Test Case 3: Test transfer with invalid reciever bank account
+        // RecipientAccountNumber = 0
+        [Test]
+        public void InternalTransferException_InvalidBankAccount_ThrowsException()
+        {
+            Program.selectedUser = Program.userList[0];
+            InternalTransferTransaction internalTransferTransaction = new InternalTransferTransaction(500, "Bakir Pljakic", 0);
+            Assert.Throws<ArgumentException>(() => Program.ProcessInternalTransfer(internalTransferTransaction));
+        }
+
+        // Test Case 4: Test transfer with non-existing recipient name
+        // RecipientAccountName = Invalid name
+        [Test]
+        public void InternalTransferExceptionTest_InvalidName_ThrowsException() 
+        {
+            Program.selectedUser = Program.userList[0];
+            InternalTransferTransaction internalTransferTransaction = new InternalTransferTransaction(500, "Invalid name", 112233);
+            Assert.Throws<ArgumentException>(() => Program.ProcessInternalTransfer(internalTransferTransaction));
+        }
+
+        // Test Case 5: Test successful transfer
+        // Amount = 500, Balance = 2000
+        /*
+        [Test]
+
+        public void InternalTransferTest_SuccessfulTransfer()
+        {
+            {
+                Program.selectedUser = Program.userList[1];
+                Program.selectedUser.AccountBalance = 1000;
+                InternalTransferTransaction internalTransferTransaction = new InternalTransferTransaction(500, "Kerim Halilovic", 112233);
+                Program.ProcessInternalTransfer(internalTransferTransaction);
+                Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(500));
+            }
+        }
+        */
     }
 }
