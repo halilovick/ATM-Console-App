@@ -92,6 +92,24 @@ namespace TestProject1
             Assert.AreEqual("Withdrawal transaction", transaction.Description);
         }
 
+        //Zamjenski objekat
+        [Test]
+        public void MakeWithdrawalMethodTest()
+        {
+            var withdrawalAmount = 300;
+            var initialBalance = 1000;
+            var mockUser = new User
+            {
+                Id = 7,
+                CardPin = "1234",
+                AccountBalance = initialBalance,
+            };
+            Program.selectedUser = mockUser;
+            Program.MakeWithdrawal(withdrawalAmount);
+            Assert.AreEqual(initialBalance - withdrawalAmount, Program.selectedUser.AccountBalance);
+        }
+
+
 
         [Test]
         public void WithdrawMoneyTest()
@@ -842,7 +860,7 @@ namespace TestProject1
 
         // Test Case 5: Test successful transfer
         // Amount = 500, Balance = 2000
-        /*
+        
         [Test]
 
         public void InternalTransferTest_SuccessfulTransfer()
@@ -855,6 +873,6 @@ namespace TestProject1
                 Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(500));
             }
         }
-        */
+        
     }
 }
