@@ -26,13 +26,26 @@ namespace TestProject1
         public interface MockInterface
         {
             int Id { get; set; }
+            string FullName {  get; set; }
             string CardPin { get; set; }
+
+            long CardNumber { get; set; }
+
+            decimal AccountBalance {  get; set; }
+
+            long AccountNumber {  get; set; }
+
         }
 
         public class Mock : MockInterface
         {
             public int Id { get; set; }
+            public string FullName { get; set; }
             public string CardPin { get; set; }
+            public long CardNumber { get; set; }
+
+            public decimal AccountBalance { get; set; }
+            public long AccountNumber { get; set; }
             
         }
         [SetUp]
@@ -74,41 +87,37 @@ namespace TestProject1
             Assert.That(Program._listOfTransactions[numberOfTransactions].Amount, Is.EqualTo(100));
         }
 
-        // Zamjenski objekat
+
+        //Zamjenski objekat
         [Test]
-        public void CreateTransactionMockTest()
+        public void ViewAccountInformation_Test()
         {
+    
             var mockUser = new Mock();
-            mockUser.CardPin = "1234";
-            mockUser.Id = 1;
+            mockUser.FullName = "Mock Test";
+            mockUser.CardNumber = 252525;
+            mockUser.AccountNumber = 121212;
+            var output = new StringWriter();
+            Console.SetOut(output);
+            ATMScreen.DisplayAccountInformation(mockUser.FullName, mockUser.CardNumber, mockUser.AccountNumber);
+            Assert.That(output.ToString().Contains("Mock Test"));
+            Assert.That(output.ToString().Contains("252525"));
+            Assert.That(output.ToString().Contains("121212"));
 
-            Program.CreateTransaction(mockUser.Id, "Withdrawal", 50, "Withdrawal transaction");
-
-            Assert.AreEqual(1, Program._listOfTransactions.Count);
-            var transaction = Program._listOfTransactions[0];
-            Assert.AreEqual(mockUser.Id, transaction.UserBankAccountId);
-            Assert.AreEqual("Withdrawal", transaction.TransactionType);
-            Assert.AreEqual(50, transaction.Amount);
-            Assert.AreEqual("Withdrawal transaction", transaction.Description);
         }
 
         //Zamjenski objekat
         [Test]
-        public void MakeWithdrawalMethodTest()
+        public void WelcomeCustomer_MockTest()
         {
-            var withdrawalAmount = 300;
-            var initialBalance = 1000;
-            var mockUser = new User
-            {
-                Id = 7,
-                CardPin = "1234",
-                AccountBalance = initialBalance,
-            };
-            Program.selectedUser = mockUser;
-            Program.MakeWithdrawal(withdrawalAmount);
-            Assert.AreEqual(initialBalance - withdrawalAmount, Program.selectedUser.AccountBalance);
-        }
+            var mockUser = new Mock();
+            mockUser.FullName = "Mock Test";
+            var output = new StringWriter();
+            Console.SetOut(output);
+            ATMScreen.WelcomeCustomer(mockUser.FullName);
+            Assert.That(output.ToString().Contains("Welcome Mock Test"));
 
+        }
 
 
         [Test]
