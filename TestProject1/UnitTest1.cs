@@ -541,16 +541,39 @@ namespace TestProject1
             Assert.That(output.ToString().Contains("Please insert your card"));
         }
 
-        /*[Test]
+        [Test]
         public void GetPINInputTest()
         {
             var output = new StringWriter();
             Console.SetOut(output);
-            var input = new StringReader("1\n2\n3\n4\n");
-            Console.SetIn(input);
-            var pin = Utility.GetPINInput("Enter your card PIN");
+            List<ConsoleKeyInfo> consoleKeys = new List<ConsoleKeyInfo>{
+                new ConsoleKeyInfo('1', ConsoleKey.D1, false, false, false),
+                new ConsoleKeyInfo('2', ConsoleKey.D2, false, false, false),
+                new ConsoleKeyInfo('3', ConsoleKey.D3, false, false, false),
+                new ConsoleKeyInfo('4', ConsoleKey.D4, false, false, false),
+                new ConsoleKeyInfo('\r', ConsoleKey.Enter, false, false, false)
+            };
+            var pin = Utility.GetPINInput("Enter your card PIN", consoleKeys);
             Assert.That(pin, Is.EqualTo("1234"));
-        }*/
+        }
+
+        [Test]
+        public void GetPINInputBackspaceTest()
+        {
+            var output = new StringWriter();
+            Console.SetOut(output);
+            List<ConsoleKeyInfo> consoleKeys = new List<ConsoleKeyInfo>{
+                new ConsoleKeyInfo('1', ConsoleKey.D1, false, false, false),
+                new ConsoleKeyInfo('2', ConsoleKey.D2, false, false, false),
+                new ConsoleKeyInfo('2', ConsoleKey.D2, false, false, false),
+                new ConsoleKeyInfo('\b', ConsoleKey.Backspace, false, false, false),
+                new ConsoleKeyInfo('3', ConsoleKey.D3, false, false, false),
+                new ConsoleKeyInfo('4', ConsoleKey.D4, false, false, false),
+                new ConsoleKeyInfo('\r', ConsoleKey.Enter, false, false, false)
+            };
+            var pin = Utility.GetPINInput("Enter your card PIN", consoleKeys);
+            Assert.That(pin, Is.EqualTo("1234"));
+        }
 
         //Test Driven Development
         [Test]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using System.Threading;
@@ -13,10 +14,11 @@ namespace ATMConsoleApp
             return ++transactionCounter;
         }
 
-        public static string GetPINInput(string prompt)
+        public static string GetPINInput(string prompt, List<ConsoleKeyInfo> consoleKeys = null)
         {
             bool isPrompt = true;
             string asterics = "";
+            int index = 0;
 
             StringBuilder input = new StringBuilder();
 
@@ -26,7 +28,8 @@ namespace ATMConsoleApp
                     Console.WriteLine(prompt);
                 isPrompt = false;
 
-                ConsoleKeyInfo inputKey = Console.ReadKey(true);
+                ConsoleKeyInfo inputKey = consoleKeys != null ? consoleKeys[index] : Console.ReadKey(true);
+                index = index + 1;
 
                 if (inputKey.Key == ConsoleKey.Enter)
                 {
