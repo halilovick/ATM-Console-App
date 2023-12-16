@@ -119,6 +119,9 @@ namespace ATMConsoleApp
 
         public static void DisplayExchangeRate()
         {
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
             Console.WriteLine("\nExchange rate");
             for (int i = 0; i < exchangeRateList.Count; i++)
             {
