@@ -1046,10 +1046,10 @@ namespace TestProject1
         {
             {
                 Program.selectedUser = Program.userList[1];
-                Program.selectedUser.AccountBalance = 1000;
+                Program.selectedUser.AccountBalance = 2000;
                 InternalTransferTransaction internalTransferTransaction = new InternalTransferTransaction(500, "Kerim Halilovic", 112233);
                 Program.ProcessInternalTransfer(internalTransferTransaction);
-                Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(500));
+                Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(1500));
             }
         }
         
