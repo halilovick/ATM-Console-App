@@ -262,6 +262,21 @@ namespace TestProject1
             Assert.That(firstLine, Is.EqualTo("Your account balance is: 1000 EUR"));
         }
 
+        //White box - ViewTransaction
+        //TC1: transaction: none
+        [Test]
+        public void ViewTransactionsEmptyTest()
+        {
+            Program.selectedUser = Program.userList[0];
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.ViewTransaction();
+            string[] lines = output.ToString().Split(new[] { "\r\n" }, StringSplitOptions.None);
+            string firstLine = lines.Length > 0 ? lines[0] : string.Empty;
+            Assert.That(firstLine.ToString(), Is.EqualTo("You have no transaction yet."));
+        }
+
+        //TC2: transaction: existing, no sorting
         [Test]
         public void ViewTransactionsTest()
         {
@@ -287,6 +302,7 @@ namespace TestProject1
             Assert.That(concatenatedLines.ToString(), Is.EqualTo(table));
         }
 
+        //TC3: transaction:existing, sorting by amount
         [Test]
         public void ViewTransactionsSortAmountTest()
         {
@@ -312,6 +328,7 @@ namespace TestProject1
             Assert.That(concatenatedLines.ToString(), Is.EqualTo(table));
         }
 
+        //TC4: transaction:existing, sorting by type
         [Test]
         public void ViewTransactionsSortTypeTest()
         {
@@ -337,17 +354,6 @@ namespace TestProject1
             Assert.That(concatenatedLines.ToString(), Is.EqualTo(table));
         }
 
-        [Test]
-        public void ViewTransactionsEmptyTest()
-        {
-            Program.selectedUser = Program.userList[0];
-            var output = new StringWriter();
-            Console.SetOut(output);
-            Program.ViewTransaction();
-            string[] lines = output.ToString().Split(new[] { "\r\n" }, StringSplitOptions.None);
-            string firstLine = lines.Length > 0 ? lines[0] : string.Empty;
-            Assert.That(firstLine.ToString(), Is.EqualTo("You have no transaction yet."));
-        }
 
         [Test]
         public void InternalTransferExceptionTest1()
