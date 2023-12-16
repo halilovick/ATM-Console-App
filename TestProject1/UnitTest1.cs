@@ -18,6 +18,7 @@ using System.Globalization;
 using System.Linq;
 using System.Xml;
 using NUnit.Framework.Internal;
+using Moq;
 
 namespace TestProject1
 {
@@ -69,11 +70,11 @@ namespace TestProject1
         [Test]
         public void ChangePinMethodMockTest()
         {
-            var mockUser = new Mock();
-            mockUser.CardPin = "1234";
-            mockUser.Id = 1;
-            Program.ChangePin("6666", mockUser.Id);
-            Assert.Pass(mockUser.CardPin, Program.HashFunction("6666"));
+            var mockUser = new Mock<Mock>();
+            mockUser.Object.CardPin = "1234";
+            mockUser.Object.Id = 1;
+            Program.ChangePin("6666", mockUser.Object.Id);
+            Assert.Pass(mockUser.Object.CardPin, Program.HashFunction("6666"));
         }
 
         [Test]
