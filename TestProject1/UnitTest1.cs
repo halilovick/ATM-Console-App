@@ -892,42 +892,87 @@ namespace TestProject1
 
         //White Box testing for method MakeWithdrawal
 
-        // Test Case 1: Test successful withdrawal 
-        // Amount = 50, Balance = 1000
+        // Test Case 1: Test successful withdrawal with console input 
+        // Amount = 30, Balance = 1000
         [Test]
-        public void MakeWithdrawal_SuccessfulWithdrawal_ReturnsTrue()
+        public void MakeWithdrawalFromConsole_SuccessfulWithdrawal_ReturnsTrue()
         {
             decimal initialBalance = 1000.00m;
             Program.selectedUser = new User { Id = 7, AccountBalance = initialBalance };
-            Program.MakeWithdrawal(50);
-            decimal expectedBalance = initialBalance - 50;
+            var input = new StringReader("0\n30\n");
+            Console.SetIn(input);
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.MakeWithdrawal();
+            decimal expectedBalance = initialBalance - 30;
             Assert.AreEqual(expectedBalance, Program.selectedUser.AccountBalance);
+            Assert.That(output.ToString().Contains("You have successfully withdrawn 30"));
         }
 
-        // Test Case 2: Test withdrawal with insufficient balance
+        // Test Case 2: Test successful withdrawal with first wrong input choice 
+        // Amount = 50, Balance = 1000
+        [Test]
+        public void MakeWithdrawalFirstWrongChoice_SuccessfulWithdrawal_ReturnsTrue()
+        {
+            decimal initialBalance = 1000.00m;
+            Program.selectedUser = new User { Id = 7, AccountBalance = initialBalance };
+            var input = new StringReader("9\n\n3\n");
+            Console.SetIn(input);
+            var output = new StringWriter();
+            Console.SetOut(output);
+            Program.MakeWithdrawal();
+            decimal expectedBalance = initialBalance - 50;
+            Assert.AreEqual(expectedBalance, Program.selectedUser.AccountBalance);
+            Assert.That(output.ToString().Contains("Invalid input. Try again."));
+            Assert.That(output.ToString().Contains("You have successfully withdrawn 50"));
+        }
+
+        // Test Case 3: Test withdrawal with invalid amount (negative)
+        // Amount = -10, Balance = 500
+        [Test]
+        public void MakeWithdrawal_InvalidAmountNegative_ThrowsException()
+        {
+            decimal initialBalance = 500.00m;
+            Program.selectedUser = new User { Id = 7, AccountBalance = initialBalance };
+            var exception = Assert.Throws<ArgumentException>(() => Program.MakeWithdrawal(-10));
+            Assert.That(exception.Message, Is.EqualTo("Amount needs to be greater than zero. Try again"));
+            Assert.AreEqual(initialBalance, Program.selectedUser.AccountBalance);
+        }
+
+        // Test Case 4: Test withdrawal with invalid amount (not a multiple of 5)
+        // Amount = 33, Balance = 500
+        [Test]
+        public void MakeWithdrawal_InvalidAmountNotMultipleOfFive_ThrowsException()
+        {
+            decimal initialBalance = 500.00m;
+            Program.selectedUser = new User { Id = 7, AccountBalance = initialBalance };
+            var exception = Assert.Throws<ArgumentException>(() => Program.MakeWithdrawal(33));
+            Assert.That(exception.Message, Is.EqualTo("You can only withdraw amount in multiples of 5 or 10 euros. Please try again."));
+            Assert.AreEqual(initialBalance, Program.selectedUser.AccountBalance);
+        }
+
+        // Test Case 5: Test withdrawal with insufficient balance
         // Amount = 1000, Balance = 500
         [Test]
         public void MakeWithdrawal_InsufficientBalance_ThrowsException()
         {
             decimal initialBalance = 500.00m;
             Program.selectedUser = new User { Id = 7, AccountBalance = initialBalance };
-            Assert.Throws<ArgumentException>(() => Program.MakeWithdrawal(1000));
+            var exception = Assert.Throws<ArgumentException>(() => Program.MakeWithdrawal(1000));
+            Assert.That(exception.Message, Is.EqualTo("Withdrawal failed. Your balance is too low to withdraw 1000"));
+            Assert.AreEqual(initialBalance, Program.selectedUser.AccountBalance);
         }
 
-        // Test Case 3: Test withdrawal with invalid amount (negative)
-        // Amount = -10
+        // Test Case 6: Test successful withdrawal with parameter sent
+        // Amount = 50, Balance = 500
         [Test]
-        public void MakeWithdrawal_InvalidAmount_ThrowsException()
+        public void MakeWithdrawalParameterSent_SuccessfulWithdrawal_ReturnsTrue()
         {
-            Assert.Throws<ArgumentException>(() => Program.MakeWithdrawal(-10));
-        }
-
-        // Test Case 4: Test withdrawal with invalid amount (not a multiple of 5)
-        // Amount = 33
-        [Test]
-        public void MakeWithdrawal_InvalidAmountNotMultipleOfFive_ThrowsException()
-        {
-            Assert.Throws<ArgumentException>(() => Program.MakeWithdrawal(33));
+            decimal initialBalance = 500.00m;
+            Program.selectedUser = new User { Id = 7, AccountBalance = initialBalance };
+            Program.MakeWithdrawal(50);
+            decimal expectedBalance = initialBalance - 50;
+            Assert.AreEqual(expectedBalance, Program.selectedUser.AccountBalance);
         }
 
         //White Box testing for method ProcessInternalTransfer
