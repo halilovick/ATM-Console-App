@@ -779,9 +779,22 @@ namespace TestProject1
             Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit));
         }
 
-        //TC4 amount = 500
+        //TC4 amount = 0
         [Test]
         public void PlaceDepositTest4()
+        {
+            Program.selectedUser = Program.userList[0];
+            var balanceBeforeDeposit = Program.selectedUser.AccountBalance;
+            var input = new StringReader("0\n1\n");
+            Console.SetIn(input);
+            var ex = Assert.Throws<System.ArgumentException>(() => Program.PlaceDeposit());
+            Assert.That(ex.Message, Is.EqualTo("Amount needs to be a number between 0 and 2000. Please try again."));
+            Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit));
+        }
+
+        //TC5 amount = 500
+        [Test]
+        public void PlaceDepositTest5()
         {
             Program.selectedUser = Program.userList[0];
             var balanceBeforeDeposit = Program.selectedUser.AccountBalance;
@@ -793,9 +806,9 @@ namespace TestProject1
             Assert.That(Program.selectedUser.AccountBalance, Is.EqualTo(balanceBeforeDeposit + 500));
         }
 
-        //TC5 amount = 500, cancel deposit
+        //TC6 amount = 500, cancel deposit
         [Test]
-        public void PlaceDepositTest5()
+        public void PlaceDepositTest6()
         {
             Program.selectedUser = Program.userList[0];
             var balanceBeforeDeposit = Program.selectedUser.AccountBalance;
