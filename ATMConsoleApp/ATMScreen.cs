@@ -1,5 +1,6 @@
 ﻿using ATMConsoleApp.Models;
 using System;
+using System.Collections.Generic;
 
 namespace ATMConsoleApp
 {
@@ -19,12 +20,12 @@ namespace ATMConsoleApp
             Utility.PressEnterToContinue();
         }
 
-        public static User UserLogin()
+        public static User UserLogin(List<ConsoleKeyInfo> consoleKeys = null)
         {
             User tempUser = new User();
 
             tempUser.CardNumber = Utility.Convert<long>("Enter your card number.");
-            tempUser.CardPin = Convert.ToString(Utility.GetPINInput("Enter your card PIN"));
+            tempUser.CardPin = Convert.ToString(Utility.GetPINInput("Enter your card PIN", consoleKeys));
             Program.HashFunction(tempUser.CardPin);
             return tempUser;
         }

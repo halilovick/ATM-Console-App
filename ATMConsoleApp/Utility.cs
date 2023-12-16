@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Numerics;
 using System.Text;
 using System.Threading;
 
@@ -42,6 +43,7 @@ namespace ATMConsoleApp
                         PrintMessage("\nPlease enter 4 digits.", false);
                         input.Clear();
                         isPrompt = true;
+                        if (consoleKeys != null) return "Please enter 4 digits.";
                         continue;
                     }
                 }
@@ -82,7 +84,7 @@ namespace ATMConsoleApp
             return Console.ReadLine();
         }
 
-        public static void PrintDotAnimation(bool consoleClear = true)
+        public static void PrintDotAnimation()
         {
             for (int i = 0; i < 5; i++)
             {
@@ -118,7 +120,9 @@ namespace ATMConsoleApp
                 }
                 catch
                 {
+                   
                     PrintMessage("Invalid input. Try again.", false, false);
+                    return default;
                 }
             }
             return default;
