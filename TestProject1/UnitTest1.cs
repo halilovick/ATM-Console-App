@@ -108,16 +108,16 @@ namespace TestProject1
 
         //Zamjenski objekat
         [Test]
-        public void ViewAccountInformation_Test()
+        public void ViewAccountInformationMockTest()
         {
     
-            var mockUser = new Mock();
-            mockUser.FullName = "Mock Test";
-            mockUser.CardNumber = 252525;
-            mockUser.AccountNumber = 121212;
+            var mockUser = new Mock<Mock>();
+            mockUser.Object.FullName = "Mock Test";
+            mockUser.Object.CardNumber = 252525;
+            mockUser.Object.AccountNumber = 121212;
             var output = new StringWriter();
             Console.SetOut(output);
-            ATMScreen.DisplayAccountInformation(mockUser.FullName, mockUser.CardNumber, mockUser.AccountNumber);
+            ATMScreen.DisplayAccountInformation(mockUser.Object.FullName, mockUser.Object.CardNumber, mockUser.Object.AccountNumber);
             Assert.That(output.ToString().Contains("Mock Test"));
             Assert.That(output.ToString().Contains("252525"));
             Assert.That(output.ToString().Contains("121212"));
@@ -126,13 +126,13 @@ namespace TestProject1
 
         //Zamjenski objekat
         [Test]
-        public void WelcomeCustomer_MockTest()
+        public void WelcomeCustomerMockTest()
         {
-            var mockUser = new Mock();
-            mockUser.FullName = "Mock Test";
+            var mockUser = new Mock<Mock>();
+            mockUser.Object.FullName = "Mock Test";
             var output = new StringWriter();
             Console.SetOut(output);
-            ATMScreen.WelcomeCustomer(mockUser.FullName);
+            ATMScreen.WelcomeCustomer(mockUser.Object.FullName);
             Assert.That(output.ToString().Contains("Welcome Mock Test"));
 
         }
