@@ -91,15 +91,15 @@ namespace TestProject1
         [Test]
         public void CreateTransactionMockTest()
         {
-            var mockUser = new Mock();
-            mockUser.CardPin = "1234";
-            mockUser.Id = 1;
+            var mockUser = new Mock<Mock>();
+            mockUser.Object.CardPin = "1234";
+            mockUser.Object.Id = 1;
 
-            Program.CreateTransaction(mockUser.Id, "Withdrawal", 50, "Withdrawal transaction");
+            Program.CreateTransaction(mockUser.Object.Id, "Withdrawal", 50, "Withdrawal transaction");
 
             Assert.AreEqual(1, Program._listOfTransactions.Count);
             var transaction = Program._listOfTransactions[0];
-            Assert.AreEqual(mockUser.Id, transaction.UserBankAccountId);
+            Assert.AreEqual(mockUser.Object.Id, transaction.UserBankAccountId);
             Assert.AreEqual("Withdrawal", transaction.TransactionType);
             Assert.AreEqual(50, transaction.Amount);
             Assert.AreEqual("Withdrawal transaction", transaction.Description);
